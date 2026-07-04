@@ -1,0 +1,45 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    ".opencode/docs/directory-structure.md",
+    ".opencode/docs/technical-preferences.md",
+    ".opencode/docs/coordination-rules.md",
+    ".opencode/docs/coding-standards.md",
+    ".opencode/docs/context-management.md",
+    "docs/engine-reference/godot/VERSION.md"
+  ],
+  "permission": {
+    "bash": {
+      "*": "allow",
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git branch*": "allow",
+      "git rev-parse*": "allow",
+      "ls *": "allow",
+      "dir *": "allow",
+      "python -m json.tool*": "allow",
+      "python -m pytest*": "allow",
+      "py -m pytest*": "allow",
+      "rm -rf *": "deny",
+      "git push --force*": "deny",
+      "git push -f *": "deny",
+      "git reset --hard*": "deny",
+      "git clean -f*": "deny",
+      "sudo *": "deny",
+      "chmod 777*": "deny",
+      "*>.env*": "deny",
+      "cat *.env*": "deny",
+      "type *.env*": "deny"
+    },
+    "read": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.*": "deny",
+      "*.env.example": "allow"
+    }
+  },
+  "plugin": [
+    ".opencode/plugins/ccgs-hooks.js"
+  ]
+}
