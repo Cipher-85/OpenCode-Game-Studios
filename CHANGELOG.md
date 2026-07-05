@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.2.1 - 2026-07-05
+
+Bridged Codex Game Studios v0.3.1–v0.3.2 decision-prompt and handoff improvements
+into the OpenCode-native port.
+
+- Added low-friction decision-prompt rules so next-step handoffs list real viable
+  options (usually 3-5, fewer when fewer are real), mark one `(Recommended)`, and
+  support short numbered or `a. yes` / `b. no` replies when OpenCode has no
+  clickable choice UI.
+- Updated `/studio-next` to rank viable next actions instead of collapsing most
+  situations to a single next step, while keeping mandatory gates as go/no-go
+  prompts.
+- Made explicit `/handoff` invocation authorize the OpenCode-native handoff
+  workflow end to end: continuity-file updates, path-scoped staging, the standard
+  handoff commit, and a normal push of the current branch. Kept the exception
+  narrowly scoped — no source edits, no branch switching, no force-push, and no
+  `--no-verify` or amend workarounds.
+- Added the `Low-Friction Decision Prompts` section and the `/handoff` exception
+  to `AGENTS.md`.
+- Modernized `docs/COLLABORATIVE-DESIGN-PRINCIPLE.md`: added the no-clickable-UI
+  fallback guidance and renamed `AskUserQuestion` → `question` throughout (the
+  original port only renamed tools in agent/skill bodies, leaving this doc on the
+  legacy Claude tool name).
+
 ## v0.2.0 - 2026-07-05
 
 - Bridged Codex Game Studios QoL improvements:
