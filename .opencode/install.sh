@@ -3,7 +3,7 @@
 #
 # Usage:
 #   bash .opencode/install.sh                              # interactive
-#   bash .opencode/install.sh --tier-opus MODEL [...]                      # CLI
+#   bash .opencode/install.sh --tier-opus MODEL [...]      # CLI
 #   bash .opencode/install.sh --dry-run                    # preview only
 #   bash .opencode/install.sh /path/to/target              # deploy to target
 set -euo pipefail
@@ -11,8 +11,8 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 source_root="$(cd "$script_dir/.." && pwd -P)"
 
-# Source model injection library
 source "$script_dir/lib/models.sh"
+source "$script_dir/lib/coexistence.sh"
 
 # ── Parse arguments ──────────────────────────────────────────────
 dry_run=0
@@ -44,22 +44,23 @@ done
 target_root="$(cd "${target_arg:-$PWD}" && pwd -P)"
 interactive=0
 
-# ── Safety: refuse non-empty target without --force ─────────────
-force=0
-if [ -n "${target_arg:-}" ]; then
+# If no tier models provided via CLI, go interactive
+if [ -z "$opus_model" ] && [ -z "$sonnet_model" ] && [ -z "$haiku_model" ]; then
+  interactive=1
+fi
+
+# ── Coexistence detection ────────────────────────────────────────
+install_mode="$(ccgs_detect_mode)"
+ccgs_print_mode_summary "$install_mode" >&2
+
+# Safety: warn for non-empty non-CCGS target
+if [ -n "${target_arg:-}" ] && [ "$install_mode" = "opencode_clean" ]; then
   if [ -d "$target_root" ] && [ -n "$(ls -A "$target_root" 2>/dev/null)" ]; then
-    # Target exists and is non-empty — check for prior CCGS install
-    if [ -f "$target_root/.opencode/install-state.json" ]; then
-      printf 'Target %s has an existing OpenCode Game Studios install.\n' "$target_root"
-      printf 'The installer will update in-place (marker-block AGENTS.md, asset refresh, model reconfiguration).\n'
-      printf 'No user files will be deleted.\n\n'
-    else
-      printf 'WARNING: Target %s exists and is not empty.\n' "$target_root" >&2
-      printf 'This is NOT a prior OpenCode Game Studios install.\n' >&2
-      printf 'The installer will deploy alongside existing content.\n' >&2
-      printf 'If you want a clean install, remove the directory manually first.\n\n' >&2
+    if [ ! -f "$target_root/.opencode/install-state.json" ]; then
+      printf 'WARNING: Target %s is not empty and has no prior OpenCode Game Studios install.\n' "$target_root" >&2
+      printf 'The installer will deploy alongside existing content.\n\n' >&2
       if [ "$dry_run" -eq 0 ]; then
-        printf 'Continue? [y/N] '
+        printf 'Continue? [y/N] ' >&2
         read -r response </dev/tty || response="n"
         case "$response" in
           y|Y|yes|YES) ;;
@@ -68,11 +69,6 @@ if [ -n "${target_arg:-}" ]; then
       fi
     fi
   fi
-fi
-
-# If no tier models provided via CLI, go interactive
-if [ -z "$opus_model" ] && [ -z "$sonnet_model" ] && [ -z "$haiku_model" ]; then
-  interactive=1
 fi
 
 # ── Welcome ──────────────────────────────────────────────────────
@@ -166,9 +162,10 @@ fi
 # ── Dry-run stop ─────────────────────────────────────────────────
 if [ "$dry_run" -eq 1 ]; then
   printf '\n── Dry Run Summary ────────────────────────────────────────\n'
-  printf '  Tier 1 (opus):   %s\n' "$opus_model"
-  printf '  Tier 2 (sonnet): %s\n' "$sonnet_model"
-  printf '  Tier 3 (haiku):  %s\n' "$haiku_model"
+  printf '  Mode:   %s\n' "$install_mode"
+  printf '  Tier 1 (opus):   %s [%s]\n' "$opus_model" "$opus_variant"
+  printf '  Tier 2 (sonnet): %s [%s]\n' "$sonnet_model" "$sonnet_variant"
+  printf '  Tier 3 (haiku):  %s [%s]\n' "$haiku_model" "$haiku_variant"
   printf '  Primary:         %s\n' "$primary_model"
   printf '\n(dry-run — no changes made)\n'
   exit 0
@@ -178,95 +175,166 @@ fi
 if [ "$source_root" != "$target_root" ]; then
   printf '\n── Deploying assets to %s ──────────────────────────────\n' "$target_root"
 
-  # Manifest-driven deploy: iterate installed-files.json for the full file list
   manifest="$source_root/.opencode/manifest/installed-files.json"
   if [ ! -f "$manifest" ]; then
     printf 'ERROR: manifest not found at %s\n' "$manifest" >&2
-    printf 'Run the installer from the source repo root.\n' >&2
     exit 1
   fi
 
-  deploy_count=0
-  marker_count=0
+  # Temp files for tracking preserved/created shared paths
+  preserved_file="$(mktemp "${TMPDIR:-/tmp}/ccgs-preserved.XXXXXX")"
+  created_file="$(mktemp "${TMPDIR:-/tmp}/ccgs-created.XXXXXX")"
+  trap 'rm -f "$preserved_file" "$created_file"' EXIT
 
-  # Use Python to iterate the manifest and copy each file
+  # Per-file deploy with coexistence guards
   python3 -c "
-import json, os, shutil, re, sys
+import json, os, shutil, re, sys, hashlib
 
 source = '$source_root'
 target = '$target_root'
+mode = '$install_mode'
+manifest_path = '$manifest'
+preserved_path = '$preserved_file'
+created_path = '$created_file'
+dry_run = 0
 
-with open('$manifest') as f:
+marker_start = '$ccgs_marker_start'
+marker_end = '$ccgs_marker_end'
+
+FOREIGN_PATTERNS = [
+    re.compile(r'^\\.claude/'), re.compile(r'^CLAUDE\\.md$'),
+    re.compile(r'/\\.claude/'), re.compile(r'/CLAUDE\\.md$'),
+    re.compile(r'^\\.codex/'), re.compile(r'/\\.codex/'),
+    re.compile(r'^\\.agents/'), re.compile(r'/\\.agents/'),
+]
+
+SHARED_PREFIXES = [
+    'CCGS Skill Testing Framework/',
+    'docs/WORKFLOW-GUIDE.md',
+    'docs/COLLABORATIVE-DESIGN-PRINCIPLE.md',
+    'docs/engine-reference/',
+    'docs/architecture/',
+    'docs/examples/',
+    'docs/registry/',
+    'design/registry/',
+    'design/AGENTS.md',
+    'design/gdd/AGENTS.md',
+    'design/gdd/systems-index.md',
+    'design/narrative/AGENTS.md',
+    'production/session-state/',
+    'production/sprints/',
+    'production/epics/',
+    'src/.gitkeep',
+]
+
+def is_foreign(path):
+    return any(p.search(path) for p in FOREIGN_PATTERNS)
+
+def is_shared(path):
+    return any(path == s or path.startswith(s) for s in SHARED_PREFIXES)
+
+def is_coexist_mode(m):
+    return m in ('claude_ccgs_coexist', 'codex_ccgs_coexist', 'multi_runtime')
+
+with open(manifest_path) as f:
     data = json.load(f)
+
+import filecmp
+
+copied = 0
+skipped_foreign = 0
+preserved = 0
+marker_files = 0
+
+preserved_list = []
+created_list = []
 
 for entry in data.get('files', []):
     rel = entry['path']
-    mode = entry.get('mode', 'copy')
+    mode_flag = entry.get('mode', 'copy')
     src = os.path.join(source, rel)
     dst = os.path.join(target, rel)
 
     if not os.path.exists(src):
         continue
 
-    # Create parent directory
+    # Hard guard: refuse foreign-runtime paths
+    if is_foreign(rel):
+        print(f'  REFUSED (foreign): {rel}', file=sys.stderr)
+        skipped_foreign += 1
+        continue
+
+    # Coexistence: preserve shared paths that already exist
+    if is_coexist_mode(mode) and is_shared(rel) and os.path.exists(dst):
+        preserved_list.append(rel)
+        preserved += 1
+        continue
+
     os.makedirs(os.path.dirname(dst), exist_ok=True)
 
-    if mode == 'marker':
-        # AGENTS.md — marker-block splice (preserve user content)
-        if os.path.isfile(dst) and '<!-- BEGIN CCGS OPENCODE PORT -->' in open(dst).read():
-            # Replace just the marker block
+    if mode_flag == 'marker' or rel == 'AGENTS.md' or rel.endswith('/AGENTS.md'):
+        # Marker-block splice
+        if os.path.isfile(dst) and marker_start in open(dst).read():
             with open(src) as f:
                 src_txt = f.read()
             with open(dst) as f:
                 dst_txt = f.read()
-            m = re.search(r'(<!-- BEGIN CCGS OPENCODE PORT -->.*?<!-- END CCGS OPENCODE PORT -->)', src_txt, re.S)
+            m = re.search(r'(' + re.escape(marker_start) + r'.*?' + re.escape(marker_end) + r')', src_txt, re.S)
             if m:
                 dst_txt = re.sub(
-                    r'<!-- BEGIN CCGS OPENCODE PORT -->.*?<!-- END CCGS OPENCODE PORT -->',
+                    re.escape(marker_start) + r'.*?' + re.escape(marker_end),
                     m.group(1), dst_txt, flags=re.S
                 )
                 with open(dst, 'w') as f:
                     f.write(dst_txt)
-                print(f'  {rel}: marker block updated')
-            else:
-                print(f'  {rel}: no source marker — skipped')
+            marker_files += 1
         elif os.path.isfile(dst):
-            # Target has file but no marker — append block
             with open(src) as f:
                 src_txt = f.read()
-            m = re.search(r'(<!-- BEGIN CCGS OPENCODE PORT -->.*?<!-- END CCGS OPENCODE PORT -->)', src_txt, re.S)
+            m = re.search(r'(' + re.escape(marker_start) + r'.*?' + re.escape(marker_end) + r')', src_txt, re.S)
             if m:
                 with open(dst, 'a') as f:
                     f.write('\n' + m.group(1) + '\n')
-                print(f'  {rel}: marker block appended')
-            else:
-                shutil.copy2(src, dst)
-                print(f'  {rel}: copied')
+            marker_files += 1
         else:
             shutil.copy2(src, dst)
-            print(f'  {rel}: copied (new)')
+            copied += 1
+            if is_shared(rel):
+                created_list.append(rel)
     elif rel == 'opencode.json':
-        # Don't overwrite existing opencode.json — user may have customizations
         if not os.path.exists(dst):
             shutil.copy2(src, dst)
-            print(f'  {rel}: copied (new)')
-        else:
-            print(f'  {rel}: exists — not overwritten')
+            copied += 1
     else:
-        # Standard copy
+        # Standard copy with backup-if-differs
+        if os.path.isfile(dst) and not filecmp.cmp(src, dst, shallow=False):
+            backup_path = os.path.join(
+                target, '.opencode', 'backups',
+                __import__('datetime').datetime.now(__import__('datetime').timezone.utc).strftime('%Y%m%dT%H%M%SZ'),
+                rel
+            )
+            os.makedirs(os.path.dirname(backup_path), exist_ok=True)
+            shutil.copy2(dst, backup_path)
         shutil.copy2(src, dst)
-        deploy_count = None  # we count in python differently
-" 2>/dev/null
+        copied += 1
+        if is_shared(rel):
+            created_list.append(rel)
 
-  # Count deployed files
-  total_copied=$(python3 -c "
-import json
-with open('$manifest') as f:
-    data = json.load(f)
-print(len(data.get('files', [])))
-" 2>/dev/null)
+# Write preserved/created lists
+with open(preserved_path, 'w') as f:
+    for p in sorted(set(preserved_list)):
+        f.write(p + '\n')
+with open(created_path, 'w') as f:
+    for p in sorted(set(created_list)):
+        f.write(p + '\n')
 
-  printf '  %s files deployed from manifest.\n' "$total_copied"
+print(f'  Copied: {copied} | Marker-spliced: {marker_files} | Preserved (shared): {preserved} | Refused (foreign): {skipped_foreign}')
+" 2>&1
+
+  # Update .gitignore allowlist at target
+  ccgs_update_gitignore_allowlist "$target_root"
+
+  printf '  Assets deployed.\n'
 fi
 
 # ── Configure models ─────────────────────────────────────────────
@@ -282,28 +350,15 @@ printf '  opencode.json → model: %s\n' "$primary_model"
 # ── Write models config ──────────────────────────────────────────
 ccgs_write_models_config "$target_root" \
   "$opus_model" "$sonnet_model" "$haiku_model" "$primary_model"
-
 printf '  .opencode/models.json written.\n'
 
-# ── Write install state ──────────────────────────────────────────
-cat > "$target_root/.opencode/install-state.json" << EOF
-{
-  "version": 1,
-  "installed_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-  "source_root": "$source_root",
-  "models": {
-    "opus": "$opus_model",
-    "sonnet": "$sonnet_model",
-    "haiku": "$haiku_model",
-    "primary": "$primary_model"
-  },
-  "variants": {
-    "opus": "$opus_variant",
-    "sonnet": "$sonnet_variant",
-    "haiku": "$haiku_variant"
-  }
-}
-EOF
+# ── Write install state (schema v2 with SHA256) ──────────────────
+ccgs_write_install_state "$target_root" "$source_root" "$install_mode" "full" \
+  "$opus_model" "$sonnet_model" "$haiku_model" "$primary_model" \
+  "$opus_variant" "$sonnet_variant" "$haiku_variant" \
+  "$preserved_file" "$created_file"
+
+printf '  install-state.json written (schema v2).\n'
 
 # ── Done ─────────────────────────────────────────────────────────
 printf '\n╔══════════════════════════════════════════════════════════════╗\n'

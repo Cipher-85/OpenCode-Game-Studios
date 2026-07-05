@@ -1182,6 +1182,11 @@
       "mode": "copy"
     },
     {
+      "path": ".opencode/lib/coexistence.sh",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
       "path": ".opencode/lib/hooks.sh",
       "owner": "opencode-game-studios",
       "mode": "copy"
@@ -2693,16 +2698,6 @@
     },
     {
       "path": "docs/registry/architecture.yaml",
-      "owner": "opencode-game-studios",
-      "mode": "copy"
-    },
-    {
-      "path": "oc-vs-codex.md",
-      "owner": "opencode-game-studios",
-      "mode": "copy"
-    },
-    {
-      "path": "opencode-plan.md",
       "owner": "opencode-game-studios",
       "mode": "copy"
     },

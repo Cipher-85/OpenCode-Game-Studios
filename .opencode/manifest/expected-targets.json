@@ -1182,6 +1182,11 @@
       "owner": "opencode-game-studios"
     },
     {
+      "path": ".opencode/lib/coexistence.sh",
+      "category": "deployed",
+      "owner": "opencode-game-studios"
+    },
+    {
       "path": ".opencode/lib/hooks.sh",
       "category": "deployed",
       "owner": "opencode-game-studios"
@@ -2693,16 +2698,6 @@
     },
     {
       "path": "docs/registry/architecture.yaml",
-      "category": "deployed",
-      "owner": "opencode-game-studios"
-    },
-    {
-      "path": "oc-vs-codex.md",
-      "category": "deployed",
-      "owner": "opencode-game-studios"
-    },
-    {
-      "path": "opencode-plan.md",
       "category": "deployed",
       "owner": "opencode-game-studios"
     },

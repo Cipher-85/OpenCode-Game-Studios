@@ -84,6 +84,36 @@ cmd_check() {
     errors=$((errors + 1))
   fi
 
+  # Check no foreign-runtime files staged or tracked
+  local foreign=0
+  for pattern in '.claude/' 'CLAUDE.md' '.codex/' '.agents/skills/'; do
+    if git -C "$root" ls-files --cached -z 2>/dev/null | grep -qz "$pattern"; then
+      printf '  ✗ Foreign-runtime file tracked: %s\n' "$pattern" >&2
+      foreign=1
+    fi
+  done
+  [ "$foreign" -eq 0 ] && printf '  ✓ No foreign-runtime files tracked\n' || errors=$((errors + 1))
+
+  # Validate manifest freshness: count should match actual files
+  local manifest_count actual_count
+  manifest_count=$(python3 -c "
+import json
+with open('$root/.opencode/manifest/installed-files.json') as f:
+    print(len(json.load(f).get('files', [])))
+" 2>/dev/null || echo 0)
+  actual_count=$(find "$root" -type f \
+    -not -path '*/.git/*' -not -path '*/node_modules/*' -not -path '*.app/*' \
+    -not -name '.DS_Store' -not -path '*/.opencode/node_modules/*' \
+    -not -path '*/.opencode/package*' -not -path '*/.opencode/backups/*' \
+    -not -path '*/.opencode/install-state.json' \
+    -not -name 'oc-vs-codex.md' -not -name 'opencode-plan.md' \
+    2>/dev/null | wc -l | tr -d ' ')
+  if [ "$manifest_count" -eq "$actual_count" ]; then
+    printf '  ✓ Manifest fresh (%s files)\n' "$manifest_count"
+  else
+    printf '  ⚠ Manifest may be stale: manifest=%s, actual=%s\n' "$manifest_count" "$actual_count" >&2
+  fi
+
   # Check gh auth
   if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
     printf '  ✓ gh authenticated\n'

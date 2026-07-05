@@ -144,3 +144,7 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 *.lnk
+
+# Local planning docs (not tracked)
+oc-vs-codex.md
+opencode-plan.md
