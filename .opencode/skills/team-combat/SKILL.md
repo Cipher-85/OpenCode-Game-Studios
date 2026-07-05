@@ -37,7 +37,7 @@ Store the resolved mode for use in all subsequent phases.
 - **ai-programmer** — Implement NPC/enemy AI behavior for the feature
 - **technical-artist** — Create VFX, shader effects, and visual feedback
 - **sound-designer** — Define audio events, impact sounds, and ambient combat audio
-- **engine specialist** (primary) — Validate architecture and implementation patterns are idiomatic for the engine (read from `.claude/docs/technical-preferences.md` Engine Specialists section)
+- **engine specialist** (primary) — Validate architecture and implementation patterns are idiomatic for the engine (read from `.opencode/docs/technical-preferences.md` Engine Specialists section)
 - **qa-tester** — Write test cases and validate the implementation
 
 ## How to Delegate

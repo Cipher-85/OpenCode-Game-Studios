@@ -1,42 +1,172 @@
-# OpenCode Game Studios — Game Studio Agent Architecture
+# OpenCode Game Studios
 
-Indie game development managed through 49 coordinated subagents.
-Each agent owns a specific domain, enforcing separation of concerns and quality.
+<!-- BEGIN CCGS OPENCODE PORT -->
+
+OpenCode Game Studios coordinates indie game development through 49 OpenCode
+subagents with strict domain ownership, user-owned design decisions, and
+verification-first implementation.
+
+## Startup Contract
+
+- Treat `.opencode/agents/*.md` as the authoritative role registration source.
+- Use exact hyphenated agent names. Shorthand: CD is `creative-director`, TD is
+  `technical-director`, and LP is `lead-programmer`.
+- Do not write to legacy Claude runtime files or add them as OpenCode runtime
+  dependencies.
+- Do not commit, push, or make game-feel/balance decisions without explicit user
+  instruction.
+- Use the active reported context percentage for compaction and handoff
+  decisions; do not rely on hardcoded token-window math.
+
+## Resume And Wrap-Up Routing
+
+- When the user asks to resume, catch up, pick up where they left off, find the
+  current state, or choose the next work item from saved state, use
+  `/resume-from-handoff` if `production/session-handoff.md` exists.
+- If no handoff exists, do not infer one from another doc. Route first-session
+  setup to `/start`, broad orientation to `/help`, or full gap discovery to
+  `/project-stage-detect`.
+- At wrap-up, keep `/studio-next` as the lightweight epilogue router and suggest
+  `/handoff` only when the current state should be durable for a future session.
+
+## Available OpenCode Subagents
+
+- Leadership: `creative-director`, `technical-director`, `producer`.
+- Department leads: `game-designer`, `lead-programmer`, `art-director`,
+  `audio-director`, `narrative-director`, `qa-lead`, `release-manager`,
+  `localization-lead`.
+- Design/content: `systems-designer`, `level-designer`, `economy-designer`,
+  `writer`, `world-builder`, `ux-designer`, `accessibility-specialist`,
+  `live-ops-designer`, `community-manager`, `analytics-engineer`.
+- Engineering/QA/ops: `gameplay-programmer`, `engine-programmer`,
+  `ai-programmer`, `network-programmer`, `tools-programmer`, `ui-programmer`,
+  `technical-artist`, `sound-designer`, `performance-analyst`,
+  `security-engineer`, `devops-engineer`, `qa-tester`, `prototyper`.
+- Engine agents: `godot-specialist`, `godot-gdscript-specialist`,
+  `godot-csharp-specialist`, `godot-shader-specialist`,
+  `godot-gdextension-specialist`, `unity-specialist`, `unity-dots-specialist`,
+  `unity-shader-specialist`, `unity-addressables-specialist`,
+  `unity-ui-specialist`, `unreal-specialist`, `ue-blueprint-specialist`,
+  `ue-gas-specialist`, `ue-replication-specialist`, `ue-umg-specialist`.
 
 ## Technology Stack
 
-- **Engine**: [CHOOSE: Godot 4 / Unity / Unreal Engine 5]
-- **Language**: [CHOOSE: GDScript / C# / C++ / Blueprint]
-- **Version Control**: Git with trunk-based development
-- **Build System**: [SPECIFY after choosing engine]
-- **Asset Pipeline**: [SPECIFY after choosing engine]
+- Engine: [CHOOSE: Godot 4 / Unity / Unreal Engine 5].
+- Primary language: [CHOOSE: GDScript / C# / C++ / Blueprint].
+- Version control: Git with trunk-based development.
+- Build system: [SPECIFY after choosing engine].
+- Asset pipeline: [SPECIFY after choosing engine].
+- Engine reference: after engine setup, read the matching
+  `docs/engine-reference/<engine>/VERSION.md` before using engine APIs; the
+  pinned engine may be newer than much model training data.
+- Technical routing: read `.opencode/docs/technical-preferences.md` when
+  selecting engine specialists or file-extension routing.
 
-> **Note**: Engine-specialist agents exist for Godot, Unity, and Unreal with
-> dedicated sub-specialists. Use the set matching your engine.
+## Collaboration Boundary
 
-## Project Structure & Technical References
+This project is user-driven, not autonomous execution. Every task follows:
+Question -> Options -> Decision -> Draft -> Approval.
 
-The following reference docs are loaded globally as instructions via `opencode.json`
-(`instructions` array), so every agent has access to them without per-file imports:
-
-- Project directory structure (`.opencode/docs/directory-structure.md`)
-- Technical preferences (`.opencode/docs/technical-preferences.md`)
-- Coordination rules (`.opencode/docs/coordination-rules.md`)
-- Coding standards (`.opencode/docs/coding-standards.md`)
-- Context management (`.opencode/docs/context-management.md`)
-- Engine version reference (`docs/engine-reference/godot/VERSION.md`)
-
-## Collaboration Protocol
-
-**User-driven collaboration, not autonomous execution.**
-Every task follows: **Question -> Options -> Decision -> Draft -> Approval**
-
-- Agents MUST ask "May I write this to [filepath]?" before using Write/Edit tools
-- Agents MUST show drafts or summaries before requesting approval
-- Multi-file changes require explicit approval for the full changeset
-- No commits without user instruction
+- Agents must ask "May I write this to [filepath]?" before using write/edit
+  tools.
+- Agents must show drafts or summaries before requesting approval.
+- Multi-file changes require explicit approval for the full changeset.
+- No commits without user instruction.
 
 See `docs/COLLABORATIVE-DESIGN-PRINCIPLE.md` for full protocol and examples.
 
-> **First session?** If the project has no engine configured and no game concept,
-> run `/start` to begin the guided onboarding flow.
+## Verification Integrity
+
+- Never claim a build, test, lint, smoke check, or playtest passed unless it ran
+  in this turn or you clearly label it as file-reported historical evidence.
+- If verification is blocked, state the blocker and the exact command or action
+  still owed.
+- Treat CI output as evidence only after reading the relevant job or log result,
+  not from a status badge or assumption.
+- After any false pass claim or uncertain verification state, follow
+  `.opencode/docs/verification-integrity.md` before closing the work.
+
+## Vertical-Slice Forcing Function
+
+Before recommending process work, identify the smallest next playable advance.
+Classify plausible lanes as:
+
+- `extend`: directly makes the playable slice larger or more complete.
+- `feed`: supplies required design, art, QA, or architecture input for the slice.
+- `carve-out`: useful but not on the slice path.
+
+The smallest playable advance wins unless owed verification, a gate, or a
+blocker must be cleared first.
+
+## Path-Scoped Instructions
+
+Before creating or editing files matching a path below, read the listed
+AGENTS.md file(s) with your Read tool. These files contain discipline rules you
+must follow for that path.
+
+| Path | Rule file(s) |
+| ---- | ---- |
+| `src/**` | `src/AGENTS.md` |
+| `src/gameplay/**` | `src/AGENTS.md`, `src/gameplay/AGENTS.md` |
+| `src/core/**` | `src/AGENTS.md`, `src/core/AGENTS.md` |
+| `src/ai/**` | `src/AGENTS.md`, `src/ai/AGENTS.md` |
+| `src/networking/**` | `src/AGENTS.md`, `src/networking/AGENTS.md` |
+| `src/ui/**` | `src/AGENTS.md`, `src/ui/AGENTS.md` |
+| `design/**` | `design/AGENTS.md` |
+| `design/gdd/**` | `design/AGENTS.md`, `design/gdd/AGENTS.md` |
+| `design/narrative/**` | `design/AGENTS.md`, `design/narrative/AGENTS.md` |
+| `docs/**` | `docs/AGENTS.md` |
+| `assets/data/**` | `assets/data/AGENTS.md` |
+| `assets/shaders/**` | `assets/shaders/AGENTS.md` |
+| `tests/**` | `tests/AGENTS.md` |
+| `tools/**` | `tools/AGENTS.md` |
+| `prototypes/**` | `prototypes/AGENTS.md` |
+
+## Code-Turn Discipline
+
+For code, tests, and tools:
+
+1. Think before coding: identify the behavioral contract and the minimal files
+   that need to change.
+2. Define verifiable success before editing.
+3. Prefer the simplest working design that fits existing patterns.
+4. Make surgical changes and avoid unrelated refactors.
+5. Verify with the narrowest meaningful command, then broaden when risk warrants.
+
+## Workflow Gates
+
+- Run `/design-review` before handing a GDD to programmers. Its verdict gates
+  implementation work that depends on that GDD.
+- Run `/story-done` before marking a story complete.
+- Run `/smoke-check` before QA hand-off; a failed smoke check blocks QA.
+- Run `/team-qa` when seeking sprint or feature QA sign-off.
+- Run `/code-review` after major features or when the current story/sprint state
+  calls for architectural review; it is recommended unless the active story
+  workflow or review mode makes it a gate.
+
+## File Lifecycle
+
+- Tracked docs are the project memory. Keep active state in
+  `production/session-state/active.md` when the project has one.
+- Preserve session continuity in `production/session-handoff.md`; archive only
+  when the continuity docs call for it.
+- Keep generated caches, local-only logs, and transient evidence out of tracked
+  runtime instructions unless a doc explicitly says otherwise.
+- Full rules: `.opencode/docs/file-lifecycle.md`.
+
+## Continuity Epilogue
+
+After each discrete work unit, apply this mentally or run `/studio-next`:
+
+1. Summarize what was completed.
+2. Surface owed verification.
+3. Recommend the single best next action from handoff, session, sprint, stage,
+   workflow, and slice state.
+4. Suggest `/handoff` when session state should be preserved.
+
+Read `.opencode/docs/session-continuity.md` and
+`.opencode/docs/context-management.md` for full pause/resume guidance.
+
+> First session? If the project has no configured game concept, run `/start`.
+
+<!-- END CCGS OPENCODE PORT -->

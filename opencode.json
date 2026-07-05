@@ -6,6 +6,9 @@
     ".opencode/docs/coordination-rules.md",
     ".opencode/docs/coding-standards.md",
     ".opencode/docs/context-management.md",
+    ".opencode/docs/verification-integrity.md",
+    ".opencode/docs/session-continuity.md",
+    ".opencode/docs/file-lifecycle.md",
     "docs/engine-reference/godot/VERSION.md"
   ],
   "permission": {

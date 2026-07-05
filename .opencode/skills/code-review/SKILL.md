@@ -11,13 +11,13 @@ metadata:
 
 ## Phase 1: Load Target Files
 
-Read the target file(s) in full. Read CLAUDE.md for project coding standards.
+Read the target file(s) in full. Read AGENTS.md for project coding standards.
 
 ---
 
 ## Phase 2: Identify Engine Specialists
 
-Read `.claude/docs/technical-preferences.md`, section `## Engine Specialists`. Note:
+Read `.opencode/docs/technical-preferences.md`, section `## Engine Specialists`. Note:
 
 - The **Primary** specialist (used for architecture and broad engine concerns)
 - The **Language/Code Specialist** (used when reviewing the project's primary language files)
@@ -184,3 +184,11 @@ Use `question`:
 If an ARCHITECTURAL VIOLATION is found:
 - If the violation contradicts an **existing ADR**: fix the implementation to comply with `docs/architecture/[adr-file].md`. If the design has legitimately changed, run `/architecture-decision` to formally *revise* the existing ADR — do not create a competing one.
 - If **no ADR exists** for the pattern that was violated: run `/architecture-decision` to document the correct approach before fixing the code.
+
+---
+
+## Continuity
+
+After the review is complete and the user has chosen how to proceed, run
+`/studio-next` to recommend the single best next action. If session state should
+be preserved before pausing, suggest `/handoff`.

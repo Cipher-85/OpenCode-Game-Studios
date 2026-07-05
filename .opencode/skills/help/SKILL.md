@@ -23,7 +23,7 @@ gap analysis, use `/project-stage-detect`.
 
 ## Step 1: Read the Catalog
 
-Read `.claude/docs/workflow-catalog.yaml`. This is the authoritative list of all
+Read `.opencode/docs/workflow-catalog.yaml`. This is the authoritative list of all
 phases, their steps (in order), whether each step is required or optional, and
 the artifact globs that indicate completion.
 
@@ -31,7 +31,7 @@ the artifact globs that indicate completion.
 
 ## Step 1b: Find Skills Not in the Catalog
 
-After reading the catalog, Glob `.claude/skills/*/SKILL.md` to get the full list
+After reading the catalog, Glob `.opencode/skills/*/SKILL.md` to get the full list
 of installed skills. For each file, extract the `name:` field from its frontmatter.
 
 Compare against the `command:` values in the catalog. Any skill whose name does
@@ -228,3 +228,11 @@ Only show this if the user's input suggested confusion (e.g. "I don't know", "st
   reassuring and give one action, not a list of six.
 - **One primary recommendation** — the user should leave knowing exactly one thing
   to do next. Optional steps and "coming up" are secondary context.
+
+---
+
+## Continuity
+
+After the user completes the recommended step, run `/studio-next` to recommend
+the next best action. This keeps work flowing without disorientation between
+phases.

@@ -27,7 +27,7 @@ Resolve the review mode (once, store for all gate spawns this run):
 2. Else read `production/review-mode.txt` → use that value
 3. Else → default to `lean`
 
-See `.claude/docs/director-gates.md` for the full check pattern.
+See `.opencode/docs/director-gates.md` for the full check pattern.
 
 **If a file path is provided** (e.g., `/story-done production/epics/core/story-damage-calculator.md`):
 read that file directly.
@@ -235,7 +235,7 @@ For each deviation found, categorize:
 - `lean` → skip (not a PHASE-GATE). Note: "QL-TEST-COVERAGE skipped — Lean mode." Proceed to Phase 5.
 - `full` → spawn as normal.
 
-After completing the deviation checks in Phase 4, spawn `qa-lead` via task using gate **QL-TEST-COVERAGE** (`.claude/docs/director-gates.md`).
+After completing the deviation checks in Phase 4, spawn `qa-lead` via task using gate **QL-TEST-COVERAGE** (`.opencode/docs/director-gates.md`).
 
 Pass:
 - The story file path and story type
@@ -267,7 +267,7 @@ Skip this phase for Config/Data stories (no code tests required).
   - Record the answer in the completion notes (Phase 7). All three options proceed to Phase 6.
 - `full` → spawn as normal.
 
-Spawn `lead-programmer` via task using gate **LP-CODE-REVIEW** (`.claude/docs/director-gates.md`).
+Spawn `lead-programmer` via task using gate **LP-CODE-REVIEW** (`.opencode/docs/director-gates.md`).
 
 Pass: implementation file paths, story file path, relevant GDD section, governing ADR.
 
@@ -458,3 +458,10 @@ If no more stories are ready but Must Have stories are still In Progress (not Co
 - Run `/story-readiness [next-story-path]` to validate the next story before starting implementation
 - If all Must Have stories are complete: run `/smoke-check sprint` → `/team-qa sprint` → `/gate-check`
 - If tech debt was logged: track it via `/tech-debt` to keep the register current
+
+---
+
+## Continuity
+
+After the story is closed, run `/studio-next` to recommend the single best next
+action. If session state should be preserved before pausing, suggest `/handoff`.

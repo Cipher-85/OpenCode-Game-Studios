@@ -21,7 +21,7 @@ This skill is the entry point for new users. It does NOT assume you have a game 
 Before asking anything, silently gather context so you can tailor your guidance. Do NOT show these results unprompted — they inform your recommendations, not the conversation opener.
 
 Check:
-- **Engine configured?** Read `.claude/docs/technical-preferences.md`. If the Engine field contains `[TO BE CONFIGURED]`, the engine is not set.
+- **Engine configured?** Read `.opencode/docs/technical-preferences.md`. If the Engine field contains `[TO BE CONFIGURED]`, the engine is not set.
 - **Game concept exists?** Check for `design/gdd/game-concept.md`.
 - **Source code exists?** Glob for source files in `src/` (`*.gd`, `*.cs`, `*.cpp`, `*.h`, `*.rs`, `*.py`, `*.js`, `*.ts`).
 - **Prototypes exist?** Check for subdirectories in `prototypes/`.
@@ -244,3 +244,11 @@ Verdict: **COMPLETE** — user oriented and handed off to next step.
 3. **User decides** — they pick the direction
 4. **No auto-execution** — recommend the next skill, don't run it without asking
 5. **Adapt** — if the user's situation doesn't fit a template, listen and adjust
+
+---
+
+## Continuity
+
+After the user completes their first step, `/studio-next` is available as a
+lightweight continuity router for recommending the next best action throughout
+the project.
