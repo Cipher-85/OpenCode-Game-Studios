@@ -150,9 +150,7 @@ ccgs_is_shared_path() {
     docs/registry/*) return 0 ;;
     design/registry/*) return 0 ;;
     design/AGENTS.md) return 0 ;;
-    design/gdd/AGENTS.md) return 0 ;;
     design/gdd/systems-index.md) return 0 ;;
-    design/narrative/AGENTS.md) return 0 ;;
     production/session-state/*) return 0 ;;
     production/sprints/*) return 0 ;;
     production/epics/*) return 0 ;;

@@ -218,9 +218,7 @@ SHARED_PREFIXES = [
     'docs/registry/',
     'design/registry/',
     'design/AGENTS.md',
-    'design/gdd/AGENTS.md',
     'design/gdd/systems-index.md',
-    'design/narrative/AGENTS.md',
     'production/session-state/',
     'production/sprints/',
     'production/epics/',
@@ -272,7 +270,7 @@ for entry in data.get('files', []):
 
     os.makedirs(os.path.dirname(dst), exist_ok=True)
 
-    if mode_flag == 'marker' or rel == 'AGENTS.md' or rel.endswith('/AGENTS.md'):
+    if mode_flag == 'marker':
         # Marker-block splice
         if os.path.isfile(dst) and marker_start in open(dst).read():
             with open(src) as f:
