@@ -1,6 +1,6 @@
 ---
 name: studio-next
-description: "Lightweight OpenCode Game Studios continuity router. Reads handoff, session, sprint, stage, workflow, and slice state to recommend the single best next action after a work unit."
+description: "Lightweight OpenCode Game Studios continuity router. Reads handoff, session, sprint, stage, workflow, and slice state to list viable next actions with one recommended choice after a work unit."
 ---
 
 # Studio Next
@@ -98,7 +98,7 @@ Route using installed commands when possible:
 If a routed command is not installed, recommend the closest installed command and
 state the missing command plainly.
 
-## Step 4: Rank And Choose One Best Action
+## Step 4: Rank Viable Actions
 
 Rank candidates in this order:
 
@@ -110,34 +110,50 @@ Rank candidates in this order:
 6. Handoff preservation if session state should be durable.
 7. Optional hygiene or carve-out work.
 
-Recommend exactly one best next action. Include:
+List all viable next actions in ranked order. Usually this is 3-5 choices, but
+fewer is correct when fewer are genuinely viable. Do not invent filler options
+to reach a target count. Mark exactly one choice `(Recommended)`.
+
+For each option include:
 
 - Command to run.
-- Why this is the best next action now.
+- Why this action is viable now.
 - Slice classification (`extend`, `feed`, or `carve-out`).
 - Any prerequisite owed check.
 - Whether the recommendation is based on verified state or file-reported state.
 
-## Step 5: Use Structured Choice Only When Needed
+## Step 5: Use Low-Friction Choice Prompts
 
-If there is one clear best action, output it and stop. Do not ask an unnecessary
-choice question.
-
-If there are genuinely 2-3 viable lanes with similar priority, use the `question`
-tool when available:
+When several next actions are viable, use the `question` tool when available:
 
 - Header: `Next work`
 - Question: `Which lane should we take next?`
-- Options: 2-3 mutually exclusive lanes
+- Options: all viable lanes, usually 3-5 when available and fewer when fewer are
+  real
 - Put the recommended lane first and append `(Recommended)` to its label
 - Each option description must include command, reason, slice classification,
   and rough size in sessions
 
 If the `question` tool is unavailable, fall back to a concise numbered prompt
-with the same 2-3 options.
+with the same options:
+
+```text
+1. <Command/action> (Recommended) - <brief reason> [extend/feed/carve-out]
+2. <Command/action> - <brief reason> [extend/feed/carve-out]
+3. <Command/action> - <brief reason> [extend/feed/carve-out]
+```
+
+Use a binary prompt only when there is one mandatory action because a gate,
+blocker, or owed verification must be cleared before any other work is valid:
+
+```text
+a. yes
+b. no
+```
 
 Do not use a broad "what do you want to do?" ending. The output must either
-recommend one action or offer a small structured lane choice.
+offer the viable next lanes as a compact choice list or, for mandatory actions,
+offer a go/no-go prompt.
 
 ## Output Shape
 
@@ -147,18 +163,18 @@ recommend one action or offer a small structured lane choice.
 State read: <files used, with missing files omitted>
 Slice: <version or unset> | Last clean boot/playtest: <verified/reported/unset>
 
-Best next action:
-- <command> - <why this is next> [extend/feed/carve-out, <verified/reported>]
+Viable next actions:
+1. <command> (Recommended) - <why this is best now> [extend/feed/carve-out, <verified/reported>]
+2. <command> - <why this is viable> [extend/feed/carve-out, <verified/reported>]
+3. <command> - <why this is viable> [extend/feed/carve-out, <verified/reported>]
 
 Owed before starting:
 - <checks or "None">
 
-Why not the other lanes:
-- <short note only when another lane looked plausible>
+Mandatory gate, if one blocks all other work:
+a. yes
+b. no
 ```
-
-When multiple lanes are viable, add the structured choice immediately after this
-briefing.
 
 ## Continuity Epilogue Pattern
 
@@ -167,5 +183,5 @@ the user did not invoke `/studio-next` explicitly:
 
 1. Summarize what completed.
 2. Surface owed verification.
-3. Recommend the single best next action.
+3. List viable next actions with one recommended option.
 4. Suggest `/handoff` when session state should be preserved.
