@@ -44,6 +44,32 @@ done
 target_root="$(cd "${target_arg:-$PWD}" && pwd -P)"
 interactive=0
 
+# ── Safety: refuse non-empty target without --force ─────────────
+force=0
+if [ -n "${target_arg:-}" ]; then
+  if [ -d "$target_root" ] && [ -n "$(ls -A "$target_root" 2>/dev/null)" ]; then
+    # Target exists and is non-empty — check for prior CCGS install
+    if [ -f "$target_root/.opencode/install-state.json" ]; then
+      printf 'Target %s has an existing OpenCode Game Studios install.\n' "$target_root"
+      printf 'The installer will update in-place (marker-block AGENTS.md, asset refresh, model reconfiguration).\n'
+      printf 'No user files will be deleted.\n\n'
+    else
+      printf 'WARNING: Target %s exists and is not empty.\n' "$target_root" >&2
+      printf 'This is NOT a prior OpenCode Game Studios install.\n' >&2
+      printf 'The installer will deploy alongside existing content.\n' >&2
+      printf 'If you want a clean install, remove the directory manually first.\n\n' >&2
+      if [ "$dry_run" -eq 0 ]; then
+        printf 'Continue? [y/N] '
+        read -r response </dev/tty || response="n"
+        case "$response" in
+          y|Y|yes|YES) ;;
+          *) printf 'Aborted.\n'; exit 1 ;;
+        esac
+      fi
+    fi
+  fi
+fi
+
 # If no tier models provided via CLI, go interactive
 if [ -z "$opus_model" ] && [ -z "$sonnet_model" ] && [ -z "$haiku_model" ]; then
   interactive=1
