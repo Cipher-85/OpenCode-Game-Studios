@@ -262,8 +262,8 @@ for entry in data.get('files', []):
         skipped_foreign += 1
         continue
 
-    # Coexistence: preserve shared paths that already exist
-    if is_coexist_mode(mode) and is_shared(rel) and os.path.exists(dst):
+    # Coexistence: preserve ALL existing non-.opencode files (not just shared paths)
+    if is_coexist_mode(mode) and os.path.exists(dst) and not rel.startswith('.opencode/'):
         preserved_list.append(rel)
         preserved += 1
         continue
