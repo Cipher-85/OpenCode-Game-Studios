@@ -2,6 +2,46 @@
   "version": 1,
   "files": [
     {
+      "path": ".github/CODEOWNERS",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": ".github/FUNDING.yml",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/bug_report.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/feature_request.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": ".github/PULL_REQUEST_TEMPLATE.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": ".github/workflows/release-check.yml",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": ".gitignore",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": ".opencode/.gitignore",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
       "path": ".opencode/README.md",
       "owner": "opencode-game-studios",
       "mode": "copy"
@@ -1152,12 +1192,12 @@
       "mode": "copy"
     },
     {
-      "path": ".opencode/package-lock.json",
+      "path": ".opencode/manifest/expected-targets.json",
       "owner": "opencode-game-studios",
       "mode": "copy"
     },
     {
-      "path": ".opencode/package.json",
+      "path": ".opencode/manifest/installed-files.json",
       "owner": "opencode-game-studios",
       "mode": "copy"
     },
@@ -1647,7 +1687,652 @@
       "mode": "copy"
     },
     {
+      "path": "CCGS Skill Testing Framework/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/README.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/directors/art-director.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/directors/creative-director.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/directors/producer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/directors/technical-director.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/godot/godot-csharp-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/godot/godot-gdextension-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/godot/godot-gdscript-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/godot/godot-shader-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/godot/godot-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/unity/unity-addressables-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/unity/unity-dots-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/unity/unity-shader-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/unity/unity-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/unity/unity-ui-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/unreal/ue-blueprint-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/unreal/ue-gas-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/unreal/ue-replication-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/unreal/ue-umg-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/engine/unreal/unreal-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/leads/audio-director.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/leads/game-designer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/leads/lead-programmer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/leads/level-designer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/leads/narrative-director.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/leads/qa-lead.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/leads/systems-designer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/operations/analytics-engineer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/operations/community-manager.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/operations/devops-engineer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/operations/economy-designer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/operations/live-ops-designer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/operations/localization-lead.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/operations/release-manager.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/qa/accessibility-specialist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/qa/qa-tester.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/qa/security-engineer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/specialists/ai-programmer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/specialists/engine-programmer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/specialists/gameplay-programmer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/specialists/network-programmer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/specialists/performance-analyst.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/specialists/prototyper.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/specialists/sound-designer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/specialists/technical-artist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/specialists/tools-programmer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/specialists/ui-programmer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/specialists/ux-designer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/specialists/world-builder.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/agents/specialists/writer.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/catalog.yaml",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/quality-rubric.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/analysis/asset-audit.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/analysis/balance-check.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/analysis/code-review.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/analysis/consistency-check.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/analysis/content-audit.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/analysis/estimate.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/analysis/perf-profile.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/analysis/scope-check.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/analysis/security-audit.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/analysis/tech-debt.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/analysis/test-evidence-review.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/analysis/test-flakiness.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/authoring/architecture-decision.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/authoring/art-bible.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/authoring/create-architecture.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/authoring/design-system.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/authoring/quick-design.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/authoring/ux-design.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/authoring/ux-review.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/gate/gate-check.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/pipeline/create-control-manifest.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/pipeline/create-epics.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/pipeline/create-stories.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/pipeline/dev-story.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/pipeline/map-systems.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/pipeline/propagate-design-change.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/readiness/story-done.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/readiness/story-readiness.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/review/architecture-review.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/review/design-review.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/review/review-all-gdds.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/sprint/changelog.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/sprint/milestone-review.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/sprint/patch-notes.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/sprint/retrospective.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/sprint/sprint-plan.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/sprint/sprint-status.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/team/team-audio.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/team/team-combat.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/team/team-level.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/team/team-live-ops.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/team/team-narrative.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/team/team-polish.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/team/team-qa.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/team/team-release.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/team/team-ui.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/adopt.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/asset-spec.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/brainstorm.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/bug-report.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/bug-triage.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/day-one-patch.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/help.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/hotfix.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/launch-checklist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/localize.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/onboard.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/playtest-report.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/project-stage-detect.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/prototype.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/qa-plan.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/regression-suite.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/release-checklist.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/reverse-document.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/setup-engine.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/skill-improve.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/skill-test.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/smoke-check.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/soak-test.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/start.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/test-helpers.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/skills/utility/test-setup.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/templates/agent-test-spec.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CCGS Skill Testing Framework/templates/skill-test-spec.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
       "path": "CHANGELOG.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "LICENSE",
       "owner": "opencode-game-studios",
       "mode": "copy"
     },
@@ -1657,7 +2342,432 @@
       "mode": "copy"
     },
     {
+      "path": "README.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "SECURITY.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "UPGRADING.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "assets/data/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "assets/shaders/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "design/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "design/gdd/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "design/narrative/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "design/registry/entities.yaml",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/COLLABORATIVE-DESIGN-PRINCIPLE.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/WORKFLOW-GUIDE.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/architecture/tr-registry.yaml",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/README.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/godot/VERSION.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/godot/breaking-changes.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/godot/current-best-practices.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/godot/deprecated-apis.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/godot/modules/animation.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/godot/modules/audio.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/godot/modules/input.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/godot/modules/navigation.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/godot/modules/networking.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/godot/modules/physics.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/godot/modules/rendering.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/godot/modules/ui.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/PLUGINS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/VERSION.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/breaking-changes.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/current-best-practices.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/deprecated-apis.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/modules/animation.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/modules/audio.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/modules/input.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/modules/navigation.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/modules/networking.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/modules/physics.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/modules/rendering.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/modules/ui.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/plugins/addressables.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/plugins/cinemachine.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unity/plugins/dots-entities.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/PLUGINS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/VERSION.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/breaking-changes.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/current-best-practices.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/deprecated-apis.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/modules/animation.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/modules/audio.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/modules/input.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/modules/navigation.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/modules/networking.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/modules/physics.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/modules/rendering.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/modules/ui.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/plugins/common-ui.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/plugins/gameplay-ability-system.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/plugins/gameplay-camera-system.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/engine-reference/unreal/plugins/pcg.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/examples/README.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/examples/reverse-document-workflow-example.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/examples/session-adopt-brownfield.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/examples/session-design-crafting-system.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/examples/session-design-system-skill.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/examples/session-gate-check-phase-transition.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/examples/session-implement-combat-damage.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/examples/session-scope-crisis-decision.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/examples/session-story-lifecycle.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/examples/session-ux-pipeline.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/examples/skill-flow-diagrams.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "docs/registry/architecture.yaml",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "oc-vs-codex.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "opencode-plan.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
       "path": "opencode.json",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "production/session-state/.gitkeep",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "prototypes/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "src/.gitkeep",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "src/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "src/ai/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "src/core/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "src/gameplay/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "src/networking/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "src/ui/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "tests/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "tools/AGENTS.md",
+      "owner": "opencode-game-studios",
+      "mode": "copy"
+    },
+    {
+      "path": "tools/validate_port.py",
       "owner": "opencode-game-studios",
       "mode": "copy"
     }

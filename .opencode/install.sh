@@ -178,68 +178,95 @@ fi
 if [ "$source_root" != "$target_root" ]; then
   printf '\n── Deploying assets to %s ──────────────────────────────\n' "$target_root"
 
-  # Core directories
-  for dir in .opencode/agents .opencode/skills .opencode/commands \
-             .opencode/hooks .opencode/plugins .opencode/docs \
-             .opencode/rules .opencode/agent-memory .opencode/lib; do
-    if [ -d "$source_root/$dir" ]; then
-      mkdir -p "$target_root/$dir"
-      cp -R "$source_root/$dir/"* "$target_root/$dir/" 2>/dev/null || true
-    fi
-  done
+  # Manifest-driven deploy: iterate installed-files.json for the full file list
+  manifest="$source_root/.opencode/manifest/installed-files.json"
+  if [ ! -f "$manifest" ]; then
+    printf 'ERROR: manifest not found at %s\n' "$manifest" >&2
+    printf 'Run the installer from the source repo root.\n' >&2
+    exit 1
+  fi
 
-  # AGENTS.md — marker-block splice (preserve user content)
-  if [ -f "$target_root/AGENTS.md" ] && grep -q '<!-- BEGIN CCGS OPENCODE PORT -->' "$target_root/AGENTS.md" 2>/dev/null; then
-    # Target has the marker block — replace just the block, preserve user content
-    python3 -c "
-import re
-with open('$source_root/AGENTS.md') as f:
-    src = f.read()
-with open('$target_root/AGENTS.md') as f:
-    dst = f.read()
+  deploy_count=0
+  marker_count=0
 
-src_block = re.search(r'(<!-- BEGIN CCGS OPENCODE PORT -->.*?<!-- END CCGS OPENCODE PORT -->)', src, re.S)
-if src_block:
-    dst = re.sub(
-        r'<!-- BEGIN CCGS OPENCODE PORT -->.*?<!-- END CCGS OPENCODE PORT -->',
-        src_block.group(1),
-        dst, flags=re.S
-    )
-    with open('$target_root/AGENTS.md', 'w') as f:
-        f.write(dst)
-    print('  AGENTS.md: marker block updated (user content preserved)')
-else:
-    print('  AGENTS.md: no source marker block found — skipped')
+  # Use Python to iterate the manifest and copy each file
+  python3 -c "
+import json, os, shutil, re, sys
+
+source = '$source_root'
+target = '$target_root'
+
+with open('$manifest') as f:
+    data = json.load(f)
+
+for entry in data.get('files', []):
+    rel = entry['path']
+    mode = entry.get('mode', 'copy')
+    src = os.path.join(source, rel)
+    dst = os.path.join(target, rel)
+
+    if not os.path.exists(src):
+        continue
+
+    # Create parent directory
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+
+    if mode == 'marker':
+        # AGENTS.md — marker-block splice (preserve user content)
+        if os.path.isfile(dst) and '<!-- BEGIN CCGS OPENCODE PORT -->' in open(dst).read():
+            # Replace just the marker block
+            with open(src) as f:
+                src_txt = f.read()
+            with open(dst) as f:
+                dst_txt = f.read()
+            m = re.search(r'(<!-- BEGIN CCGS OPENCODE PORT -->.*?<!-- END CCGS OPENCODE PORT -->)', src_txt, re.S)
+            if m:
+                dst_txt = re.sub(
+                    r'<!-- BEGIN CCGS OPENCODE PORT -->.*?<!-- END CCGS OPENCODE PORT -->',
+                    m.group(1), dst_txt, flags=re.S
+                )
+                with open(dst, 'w') as f:
+                    f.write(dst_txt)
+                print(f'  {rel}: marker block updated')
+            else:
+                print(f'  {rel}: no source marker — skipped')
+        elif os.path.isfile(dst):
+            # Target has file but no marker — append block
+            with open(src) as f:
+                src_txt = f.read()
+            m = re.search(r'(<!-- BEGIN CCGS OPENCODE PORT -->.*?<!-- END CCGS OPENCODE PORT -->)', src_txt, re.S)
+            if m:
+                with open(dst, 'a') as f:
+                    f.write('\n' + m.group(1) + '\n')
+                print(f'  {rel}: marker block appended')
+            else:
+                shutil.copy2(src, dst)
+                print(f'  {rel}: copied')
+        else:
+            shutil.copy2(src, dst)
+            print(f'  {rel}: copied (new)')
+    elif rel == 'opencode.json':
+        # Don't overwrite existing opencode.json — user may have customizations
+        if not os.path.exists(dst):
+            shutil.copy2(src, dst)
+            print(f'  {rel}: copied (new)')
+        else:
+            print(f'  {rel}: exists — not overwritten')
+    else:
+        # Standard copy
+        shutil.copy2(src, dst)
+        deploy_count = None  # we count in python differently
 " 2>/dev/null
-    printf '  AGENTS.md: marker block updated (user content preserved)\n'
-  elif [ -f "$target_root/AGENTS.md" ]; then
-    # Target has AGENTS.md but no marker block — append the block
-    src_block="$(python3 -c "
-import re
-with open('$source_root/AGENTS.md') as f:
-    src = f.read()
-m = re.search(r'(<!-- BEGIN CCGS OPENCODE PORT -->.*?<!-- END CCGS OPENCODE PORT -->)', src, re.S)
-print(m.group(1) if m else '')
-" 2>/dev/null)"
-    if [ -n "$src_block" ]; then
-      printf '\n%s\n' "$src_block" >> "$target_root/AGENTS.md"
-      printf '  AGENTS.md: marker block appended (existing content preserved)\n'
-    fi
-  else
-    # No target AGENTS.md — copy the full file
-    cp "$source_root/AGENTS.md" "$target_root/AGENTS.md"
-    printf '  AGENTS.md: copied (new file)\n'
-  fi
 
-  # opencode.json — merge plugin + instructions into existing if present
-  if [ -f "$target_root/opencode.json" ]; then
-    printf '  opencode.json: target already exists — not overwritten (merge manually)\n'
-  else
-    cp "$source_root/opencode.json" "$target_root/opencode.json"
-    printf '  opencode.json: copied (new file)\n'
-  fi
+  # Count deployed files
+  total_copied=$(python3 -c "
+import json
+with open('$manifest') as f:
+    data = json.load(f)
+print(len(data.get('files', [])))
+" 2>/dev/null)
 
-  printf '  Assets deployed.\n'
+  printf '  %s files deployed from manifest.\n' "$total_copied"
 fi
 
 # ── Configure models ─────────────────────────────────────────────
