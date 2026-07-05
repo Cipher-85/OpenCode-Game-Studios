@@ -11,6 +11,8 @@ pair for `/resume-from-handoff`.
 ## Preconditions
 
 - Respect the current branch. Never switch branches during handoff.
+- Pushing the handoff to the current branch's remote is expected behavior,
+  not a merge to main. Do not conflate the two.
 - Do not edit legacy Claude runtime files or instruction surfaces.
 - Use evidence from the current turn for every status, count, and verification
   claim.
@@ -140,16 +142,26 @@ Commit with the standard handoff subject.
 
 Never use `--no-verify`. Never amend as a workaround for a failed hook.
 
-## Phase 4: Push When Authorized
+## Phase 4: Push To Current Branch
 
-Determine the branch:
+Determine the current branch:
 
 ```bash
 git rev-parse --abbrev-ref HEAD
 ```
 
-Push only if the handoff trigger or user instruction authorizes it. If the
-branch has no upstream, use `git push -u origin <branch>`. Never force-push.
+Push the handoff commit to the current branch's remote. This is a routine
+backup of the handoff state — not a merge decision and not a push to main.
+
+- If the branch has an upstream: `git push`
+- If the branch has no upstream: `git push -u origin <branch>`
+
+Never force-push. If the push fails (auth, network, rejected), report it and
+continue to Phase 5 — the handoff is valid locally regardless.
+
+Pushing to a feature or test branch is expected handoff behavior. Only
+hesitate if the current branch is `main`, `master`, or `develop` — in that
+case, ask the user before pushing.
 
 ## Phase 5: Report And Stop
 
