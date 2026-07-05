@@ -14,6 +14,21 @@ pair for `/resume-from-handoff`.
 - Pushing the handoff to the current branch's remote is expected behavior,
   not a merge to main. Do not conflate the two.
 - Do not edit legacy Claude runtime files or instruction surfaces.
+- Explicit invocation of `/handoff` authorizes this skill's declared handoff
+  workflow without a second approval confirmation: update continuity files, stage
+  relevant uncommitted changes by path, create the standard handoff commit, and
+  push the current branch.
+- Declared continuity files:
+  `production/session-handoff.md`, `production/session-archive.md`, and
+  `production/session-state/active.md`.
+- Show the user the intended handoff label and concise update summary, then
+  run the declared handoff workflow directly. Do not pause between the summary,
+  continuity writes, commit, and push unless the work would leave the declared
+  workflow.
+- This authorization does not include making new source edits outside the
+  continuity files, design decisions, game-feel/balance calls, writes outside
+  declared continuity files, branch switching, force-pushes, or `--no-verify` /
+  amend workarounds.
 - Use evidence from the current turn for every status, count, and verification
   claim.
 - If a command fails, halt the current phase and report the exact failure.
@@ -119,7 +134,7 @@ Overwrite `production/session-state/active.md` with a short pointer stub to
 projects; keep it coherent but do not stage it unless the repo explicitly tracks
 it.
 
-## Phase 3: Commit When Authorized
+## Phase 3: Commit Handoff
 
 Run:
 
@@ -132,7 +147,8 @@ git log -5 --oneline
 If there are no relevant uncommitted changes, skip the commit and say why.
 
 Otherwise stage only the relevant paths by name. Avoid broad staging unless the
-user explicitly asked for it. Before committing, verify:
+user explicitly asked for it. `/handoff` invocation is commit authorization for
+the relevant handoff work. Before committing, verify:
 
 ```bash
 git diff --cached --name-status
@@ -142,7 +158,7 @@ Commit with the standard handoff subject.
 
 Never use `--no-verify`. Never amend as a workaround for a failed hook.
 
-## Phase 4: Push To Current Branch
+## Phase 4: Push Handoff
 
 Determine the current branch:
 
@@ -152,6 +168,8 @@ git rev-parse --abbrev-ref HEAD
 
 Push the handoff commit to the current branch's remote. This is a routine
 backup of the handoff state — not a merge decision and not a push to main.
+Explicit `/handoff` invocation is normal push authorization for the standard
+handoff commit.
 
 - If the branch has an upstream: `git push`
 - If the branch has no upstream: `git push -u origin <branch>`
