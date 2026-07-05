@@ -175,20 +175,21 @@ opencode.json                        # Permissions, plugin ref, instruction glob
   docs/
     workflow-catalog.yaml            # 7-phase pipeline definition (read by /help)
     templates/                       # 41 document templates
-  rules/                             # 11 path-scoped rule reference copies
-  agent-memory/                      # Agent memory notes (lead-programmer)
-src/                                 # Game source code
-assets/                              # Art, audio, VFX, shaders, data files
+  rules/                             # 15 path-scoped rule files (read via routing table)
+  lib/                               # models.sh, hooks.sh, coexistence.sh, validate_port.py
+  agent-memory/                      # 17 agent memory contract files
+  manifest/                          # Asset inventories for install tracking
+src/                                 # Game source code (created during development)
 design/                              # GDDs, narrative docs, level designs
 docs/                                # Technical documentation and ADRs
-tests/                               # Test suites (unit, integration, performance, playtest)
-prototypes/                          # Throwaway prototypes (isolated from src/)
 production/                          # Sprint plans, milestones, release tracking
 ```
 
-> Path-scoped coding standards live as nested `AGENTS.md` files at each rule's
-> path root (e.g. `src/gameplay/AGENTS.md`, `design/gdd/AGENTS.md`).
-> Reference copies are kept in `.opencode/rules/`.
+> Path-scoped coding standards live in `.opencode/rules/*.md` (15 flat files).
+> The routing table in `AGENTS.md` tells agents which rule file to read before
+> editing files matching each path glob. Directories like `assets/`, `tests/`,
+> and `prototypes/` are created during game development — the rules already
+> apply when they exist.
 
 ## How It Works
 
