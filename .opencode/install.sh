@@ -329,8 +329,11 @@ with open(created_path, 'w') as f:
 print(f'  Copied: {copied} | Marker-spliced: {marker_files} | Preserved (shared): {preserved} | Refused (foreign): {skipped_foreign}')
 " 2>&1
 
-  # Update .gitignore allowlist at target
-  ccgs_update_gitignore_allowlist "$target_root"
+  # Update .gitignore allowlist at target (only in clean mode — don't touch user's gitignore in coexistence)
+  case "$install_mode" in
+    opencode_clean) ccgs_update_gitignore_allowlist "$target_root" ;;
+    *) printf '  .gitignore: skipped (coexistence mode — user gitignore preserved)\n' ;;
+  esac
 
   printf '  Assets deployed.\n'
 fi
