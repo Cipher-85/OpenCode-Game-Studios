@@ -134,7 +134,7 @@ run_closeout() {
     # Trigger only when the skill declares a closeout marker.
     local has_marker=0 m
     for m in "${markers[@]}"; do
-      if rg -q -F "$m" "$f" 2>/dev/null; then has_marker=1; break; fi
+      if grep -qF "$m" "$f" 2>/dev/null; then has_marker=1; break; fi
     done
     if [ "$has_marker" -eq 0 ]; then
       pass "$s (no closeout marker; skipped)"
@@ -142,10 +142,10 @@ run_closeout() {
     fi
     local missing=() bad=()
     for m in "${required[@]}"; do
-      if ! rg -q -F "$m" "$f" 2>/dev/null; then missing+=("$m"); fi
+      if ! grep -qF "$m" "$f" 2>/dev/null; then missing+=("$m"); fi
     done
     for m in "${forbidden[@]}"; do
-      if rg -q -F "$m" "$f" 2>/dev/null; then bad+=("$m"); fi
+      if grep -qF "$m" "$f" 2>/dev/null; then bad+=("$m"); fi
     done
     if [ "${#missing[@]}" -eq 0 ] && [ "${#bad[@]}" -eq 0 ]; then
       pass "$s (closeout routing complete)"
@@ -163,13 +163,13 @@ run_runtime() {
   printf '\n── Runtime References ──────────────────────────────────────\n'
   # Check for stale Claude references
   local stale=0
-  if rg -q '\.claude/' "$root"/.opencode/agents/ "$root"/.opencode/skills/ 2>/dev/null; then
+  if grep -rq '\.claude/' "$root"/.opencode/agents/ "$root"/.opencode/skills/ 2>/dev/null; then
     fail "stale .claude/ references in agents/skills"
     stale=1
   else
     pass "no .claude/ references"
   fi
-  if rg -q 'CLAUDE\.md' "$root"/.opencode/agents/ "$root"/.opencode/skills/ 2>/dev/null; then
+  if grep -rq 'CLAUDE\.md' "$root"/.opencode/agents/ "$root"/.opencode/skills/ 2>/dev/null; then
     fail "stale CLAUDE.md references"
     stale=1
   else
@@ -275,7 +275,7 @@ run_release() {
   pass "VERSION: $version"
 
   # Check CHANGELOG has the section
-  if [ -f "$changelog" ] && rg -q "^## v${version}" "$changelog" 2>/dev/null; then
+  if [ -f "$changelog" ] && grep -q "^## v${version}" "$changelog" 2>/dev/null; then
     pass "CHANGELOG has v$version section"
   else
     fail "CHANGELOG missing v$version section"
