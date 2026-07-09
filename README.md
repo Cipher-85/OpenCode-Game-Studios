@@ -13,7 +13,7 @@
   <a href=".opencode/skills"><img src="https://img.shields.io/badge/skills-77-green" alt="77 Skills"></a>
   <a href=".opencode/commands"><img src="https://img.shields.io/badge/commands-77-yellow" alt="77 Commands"></a>
   <a href=".opencode/hooks"><img src="https://img.shields.io/badge/hooks-12-orange" alt="12 Hooks"></a>
-  <a href=".opencode/VERSION"><img src="https://img.shields.io/badge/version-0.3.0-blue" alt="v0.3.0"></a>
+  <a href=".opencode/VERSION"><img src="https://img.shields.io/badge/version-0.4.1-blue" alt="v0.4.1"></a>
   <a href="https://opencode.ai"><img src="https://img.shields.io/badge/built%20for-OpenCode-f5f5f5" alt="Built for OpenCode"></a>
 </p>
 
@@ -69,9 +69,17 @@ first brainstorm to launch.
 
 ## Current Status
 
-Package version: `0.3.0` (see [`.opencode/VERSION`](.opencode/VERSION)).
+Package version: `0.4.1` (see [`.opencode/VERSION`](.opencode/VERSION)).
 
 This release includes:
+- User-owned playtest focus routing: when owed verification or the next action
+  is a manual playtest, closeouts include a `Playtest focus:` brief with the
+  hypothesis, setup/build, observation prompts, and verdict/evidence to return.
+  `/playtest-report` templates and follow-up routing now require concrete
+  hypotheses before sending the user back to play, while preserving the user's
+  ownership of game-feel and balance verdicts. A `run_playtest_focus` validator
+  keeps the contract present in root instructions, session-continuity docs, and
+  the playtest-report workflow.
 - Session Worklist routing cache (`## Session Worklist` + `## Phase Guard` in
   `production/session-state/active.md`); `/resume-from-handoff` compiles it,
   post-work closeouts read it, and `/studio-next` is now a deprecated manual
@@ -364,7 +372,7 @@ opencode.json                        # Permissions, plugin ref, instruction file
   uninstall.sh                       # Coexistence-aware uninstaller
   audit.sh                           # Validation dispatcher
   release.sh                         # Version management + GitHub releases
-  VERSION                            # Package version (0.3.0)
+  VERSION                            # Package version (0.4.1)
 design/                              # GDDs, narrative docs (AGENTS.md + registry/)
 docs/                                # Technical docs, ADRs, engine reference
 production/                          # Sprint plans, milestones, session state

@@ -41,7 +41,14 @@ Generate this template and output it to the user:
 - **Session Type**: [First time / Returning / Targeted test]
 
 ## Test Focus
-[What specific features or flows were being tested]
+- **Hypothesis**: [What feeling, behavior, or evidence this playtest is probing]
+- **Setup/build**: [Build, commit, command, save state, or scenario if known]
+- **Observation prompts**:
+1. [Specific thing to watch for]
+2. [Specific thing to watch for]
+3. [Optional specific thing to watch for]
+4. [Optional specific thing to watch for]
+- **Verdict/evidence to return**: [User-owned pass/fail/needs-rethink verdict plus notes, screenshots, logs, or report path]
 
 ## First Impressions (First 5 minutes)
 - **Understood the goal?** [Yes/No/Partially]
@@ -96,6 +103,12 @@ Generate this template and output it to the user:
 
 Read the raw notes at the provided path. Cross-reference with existing design documents. Fill in the template above with structured findings. Flag any playtest observations that conflict with design intent.
 
+If the notes omit a specific hypothesis or focus, state that gap before
+analysis and ask for or infer only a provisional `Playtest focus:` from the
+notes. Do not route the user to another manual playtest without a concrete
+hypothesis, setup/build if known, 2-4 observation prompts, and the
+verdict/evidence the user should return.
+
 ---
 
 ## Phase 3: Action Routing
@@ -146,3 +159,7 @@ Verdict: **COMPLETE** — playtest report generated.
 - Act on the highest-priority finding category first.
 - After addressing design changes: re-run `/design-review` on the updated GDD.
 - After fixing bugs: re-run `/bug-triage` to update priorities.
+- If another user-owned playtest is the routed next step, include `Playtest
+  focus:` with the specific hypothesis, setup/build if known, 2-4 observation
+  prompts, and the verdict/evidence the user should return. The focus brief
+  narrows the test but leaves game-feel and balance decisions to the user.

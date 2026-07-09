@@ -10,6 +10,7 @@
 #   skills       Validate skill files
 #   closeout     Check closeout-routing contract on completion skills
 #   checkpoint   Check active.md silent-checkpoint contract on skills/agents
+#   playtest     Check playtest-focus contract on root/continuity/skill surfaces
 #   runtime      Check for stale references
 #   config       Validate opencode.json
 #   hooks        Test hook scripts
@@ -26,7 +27,7 @@ command="${1:-all}"
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --root) root="$(cd "$2" && pwd -P)"; shift 2 ;;
-    all|agents|skills|runtime|config|hooks|smoke|release|closeout|checkpoint) command="$1"; shift ;;
+    all|agents|skills|runtime|config|hooks|smoke|release|closeout|checkpoint|playtest) command="$1"; shift ;;
     *) shift ;;
   esac
 done
@@ -218,6 +219,44 @@ PY
   fi
 }
 
+run_playtest_focus() {
+  printf '\n── Playtest Focus Contract ────────────────────────────────\n'
+  local -a surfaces=(
+    "AGENTS.md"
+    ".opencode/docs/session-continuity.md"
+    ".opencode/skills/playtest-report/SKILL.md"
+  )
+  local -a phrases=(
+    "user-owned playtest"
+    "Playtest focus:"
+    "hypothesis"
+    "setup/build"
+    "2-4 observation"
+    "verdict/evidence"
+  )
+  local checked=0
+  local rel
+  for rel in "${surfaces[@]}"; do
+    local f="$root/$rel"
+    checked=$((checked + 1))
+    [ -f "$f" ] || { fail "$rel (missing file)"; continue; }
+    local missing=() p
+    for p in "${phrases[@]}"; do
+      if ! grep -qiF "$p" "$f" 2>/dev/null; then missing+=("$p"); fi
+    done
+    # session-continuity also requires the Session Worklist reference
+    if [ "$rel" = ".opencode/docs/session-continuity.md" ]; then
+      if ! grep -qiF "Session Worklist" "$f" 2>/dev/null; then missing+=("Session Worklist"); fi
+    fi
+    if [ "${#missing[@]}" -eq 0 ]; then
+      pass "$rel (playtest focus contract)"
+    else
+      fail "$rel missing: ${missing[*]}"
+    fi
+  done
+  printf '  %d playtest-focus surfaces checked\n' "$checked"
+}
+
 run_runtime() {
   printf '\n── Runtime References ──────────────────────────────────────\n'
   # Check for stale Claude references
@@ -364,6 +403,7 @@ case "$command" in
     run_skills
     run_closeout
     run_checkpoint
+    run_playtest_focus
     run_runtime
     run_config
     run_hooks
@@ -373,12 +413,13 @@ case "$command" in
   skills)   run_skills ;;
   closeout) run_closeout ;;
   checkpoint) run_checkpoint ;;
+  playtest) run_playtest_focus ;;
   runtime)  run_runtime ;;
   config)   run_config ;;
   hooks)    run_hooks ;;
   smoke)    run_smoke ;;
   release)  run_release ;;
-    *) printf 'Unknown command: %s\nAvailable: all, agents, skills, closeout, checkpoint, runtime, config, hooks, smoke, release\n' "$command" >&2; exit 2 ;;
+    *) printf 'Unknown command: %s\nAvailable: all, agents, skills, closeout, checkpoint, playtest, runtime, config, hooks, smoke, release\n' "$command" >&2; exit 2 ;;
 esac
 
 printf '\n── Result: %d error(s) ──\n' "$errors"

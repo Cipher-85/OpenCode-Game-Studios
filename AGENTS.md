@@ -41,6 +41,9 @@ verification-first implementation.
   `Next action:` then `1. (Recommended) [action label] - [brief reason /
   command]`. Base that next action on the `## Session Worklist` when
   `production/session-state/active.md` exists. The user can reply with `1`.
+  - When the next action or owed verification is a user-owned playtest, include
+    `Playtest focus:` with the hypothesis, setup/build if known, 2-4 observation
+    prompts, and the verdict/evidence the user should return.
 
 ## Available OpenCode Subagents
 

@@ -26,6 +26,24 @@ The checkpoint exception is narrow. It never authorizes new design, game-feel,
 balance, architecture, source, registry, index, status-file, commit, push,
 branch, build, boot-smoke, mutating `gh`, or additional file changes.
 
+## User-Owned Playtest Focus
+
+When owed verification or the next valid lane is a user-owned playtest, preserve
+a concrete focus brief in both the closeout and any `## Session Worklist` entry.
+Use the label `Playtest focus:` and include:
+
+- **Hypothesis**: what feeling, behavior, or evidence the playtest is probing.
+- **Setup/build**: the build, command, save state, or scenario to use when
+  known.
+- **Observation prompts**: 2-4 observation prompts for specific things the
+  user should watch for.
+- **Verdict/evidence to return**: the user-owned pass/fail/needs-rethink
+  verdict plus the notes, screenshots, logs, or playtest report path needed to
+  make the evidence usable.
+
+The brief narrows the test; it does not make the game-feel, balance, keep,
+revert, or tune decision for the user.
+
 ## Pause Procedure
 
 Before pausing a meaningful work unit, check whether the invoked workflow still
@@ -44,6 +62,8 @@ decision, blocker, or true stop point.
    clear next lane:
    `Next action:` then `1. (Recommended) [action label] - [brief reason /
    command]`. The user can reply with `1`.
+   If that lane is a user-owned playtest, include the preserved `Playtest
+   focus:` brief before the next-action prompt.
 4. Preserve exact next commands only when they are known to be useful.
 5. Keep local-only notes out of tracked docs unless they are project state.
 6. Suggest `/handoff [short-label]` when installed and the next session would

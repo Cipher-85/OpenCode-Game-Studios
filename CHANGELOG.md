@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.4.1 - 2026-07-09
+
+Bridged Codex Game Studios v0.4.4 (user-owned playtest focus contract) into
+the OpenCode-native port.
+
+- Added a user-owned playtest focus contract so closeouts and owed verification
+  include a `Playtest focus:` brief (hypothesis, setup/build, 2-4 observation
+  prompts, verdict/evidence) instead of generic playtest requests, while
+  leaving game-feel and balance verdicts with the user.
+- Updated `/playtest-report` templates and routing so new reports and follow-up
+  playtests carry a concrete hypothesis before sending the user back to play.
+- Updated `AGENTS.md` and `session-continuity.md` to preserve the playtest
+  focus brief in closeouts and `## Session Worklist` entries.
+- Added a `run_playtest_focus` validator to `.opencode/audit.sh` (run via
+  `audit.sh playtest` or as part of `audit.sh all`) that enforces the
+  playtest-focus contract across root instructions, continuity docs, and the
+  playtest-report workflow.
+
 ## v0.4.0 - 2026-07-09
 
 Bridged Codex Game Studios v0.4.2–v0.4.3 (silent active-session checkpoints,
