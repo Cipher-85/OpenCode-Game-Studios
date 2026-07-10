@@ -105,7 +105,47 @@ Produce a verification verdict:
 - **STILL PRESENT** — bug reproduces as described; fix did not resolve the issue
 - **CANNOT VERIFY** — automated checks inconclusive; manual playtest required
 
-Ask: "May I update `production/qa/bugs/[BUG-ID].md` to set Status: Verified Fixed / Still Present / Cannot Verify?"
+If the verdict is **VERIFIED FIXED**, treat verification, closure, stale triage
+metadata cleanup, and session-state routing as one deterministic bug lifecycle
+operation when the facts are unambiguous.
+
+Before writing, present the verification evidence and ask once for the full
+changeset:
+
+> "May I update these files to mark [BUG-ID] Verified Fixed, add verification
+> evidence, close the bug, refresh stale triage metadata when safe, and update
+> the derived checkpoint in `production/session-state/active.md`?
+> Files: `production/qa/bugs/[BUG-ID].md`, [any affected
+> `production/qa/bug-triage-*.md` files], `production/session-state/active.md`."
+
+Do not stop after VERIFIED FIXED to offer `/bug-report close [BUG-ID]` as the
+next action when closure facts are deterministic. Do not ask a separate "May I
+write?" for `production/session-state/active.md` when the update is only a
+derived checkpoint for completed bug lifecycle work. Do not ask a separate "May
+I write?" for this file.
+
+Bundle only deterministic metadata cleanup:
+- Set top-level `**Status**: Verified Fixed`.
+- Add or update verification evidence with the command(s), grep checks, commit
+  or file evidence, and verifier.
+- Append the Closure Record from Phase 2D and set top-level `**Status**: Closed`
+  when the closure record can be completed from known facts.
+- Refresh affected `production/qa/bug-triage-*.md` reports only when the refresh
+  removes closed bugs, updates open/closed counts, clears a stale recommended
+  action, or records "0 open bugs" without assigning priorities or changing
+  sprint scope.
+- Update `production/session-state/active.md` only with derived checkpoint
+  routing: completed bug lifecycle work, files touched, owed verification, and
+  the next valid Session Worklist lane.
+
+Do not bundle and stop for user decision if triage would require assigning
+priorities, choosing sprint scope, marking bugs Won't Fix, changing severity, or
+resolving conflicting bug states.
+
+If the verdict is **STILL PRESENT** or **CANNOT VERIFY**, ask:
+
+> "May I update `production/qa/bugs/[BUG-ID].md` to set Status: Still Present /
+> Cannot Verify and add the verification evidence?"
 
 If STILL PRESENT: reopen the bug, set Status back to Open, and suggest re-running `/hotfix [BUG-ID]`.
 
@@ -130,9 +170,29 @@ Append a closure record to the bug file:
 
 Update the top-level `**Status**: Open` field to `**Status**: Closed`.
 
-Ask: "May I update `production/qa/bugs/[BUG-ID].md` to mark it Closed?"
+If the bug is already `Verified Fixed`, close the bug and refresh stale triage
+metadata under the same approval when the refresh is safe deterministic cleanup.
+Before writing, list the exact files and ask once:
 
-After closing, check `production/qa/bug-triage-*.md` — if the bug appears in an open triage report, note: "Bug [ID] is referenced in the triage report. Run `/bug-triage` to refresh the open bug count."
+> "May I update these files to close [BUG-ID], refresh stale triage metadata
+> when safe, and update the derived checkpoint in
+> `production/session-state/active.md`?
+> Files: `production/qa/bugs/[BUG-ID].md`, [any affected
+> `production/qa/bug-triage-*.md` files], `production/session-state/active.md`."
+
+Do not ask a separate "May I write?" for `production/session-state/active.md`
+when the update is only a derived checkpoint for completed bug lifecycle work.
+Do not ask a separate "May I write?" for this file.
+
+Safe stale triage metadata refresh includes removing the closed bug from open
+bug tables, updating open/closed counts, clearing stale "fix this bug" actions,
+and recording a zero-open-bugs refresh. It must not assign priorities, choose
+sprint scope, mark bugs Won't Fix, change severity, or resolve conflicting bug
+states.
+
+If stale triage metadata exists but is unsafe to refresh automatically, close
+the bug and mark triage cleanup as non-blocking owed follow-up instead of
+blocking closure.
 
 ---
 
@@ -161,5 +221,8 @@ After saving, suggest based on mode:
 - Never mark a bug closed without verification — a fix that doesn't verify is still Open
 
 **After verify returns VERIFIED FIXED:**
-- Run `/bug-report close [BUG-ID]` — write the closure record and update status
-- Run `/bug-triage` to refresh the open bug count and remove it from the active list
+- When closure facts are deterministic, complete verification, closure, stale
+  triage metadata cleanup, and derived session-state routing under the same
+  approved changeset.
+- If closure or triage refresh requires a manual decision, stop at the decision
+  point and make the blocked item explicit.

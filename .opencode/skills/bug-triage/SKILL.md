@@ -21,6 +21,9 @@ ensures no critical bug is lost between sprints.
 - Sprint start — assign open bugs to the new sprint or backlog
 - After `/team-qa` completes and new bugs have been filed
 - When the bug count crosses 10+ open items
+- As bundled metadata cleanup after `/bug-report verify [BUG-ID]` or
+  `/bug-report close [BUG-ID]` closes a bug and stale triage report fields can
+  be refreshed without new prioritization decisions
 
 ---
 
@@ -50,6 +53,13 @@ If no bug files found:
 > nothing to triage."
 
 Stop and report. Do not proceed if no bugs exist.
+
+If this run is a zero-open-bugs closure refresh started from an approved
+`/bug-report verify [BUG-ID]` or `/bug-report close [BUG-ID]` lifecycle, do not
+stop for a separate triage decision. Treat it as metadata cleanup: update the
+affected stale triage report so the open bug count, priority tables, and
+recommended action reflect that no bugs remain open. Mark any broader trend or
+sprint-priority work as non-blocking follow-up.
 
 ### Step 2b — Load sprint context
 
@@ -221,6 +231,19 @@ Present the report in conversation, then ask:
 "May I write this triage report to `production/qa/bug-triage-[date].md`?"
 
 Write only after approval.
+
+Exception for bundled bug lifecycle cleanup: when `/bug-report verify [BUG-ID]`
+or `/bug-report close [BUG-ID]` already obtained approval for the full
+changeset, do not ask a second triage write prompt for deterministic metadata
+cleanup. The approval must have listed the exact stale
+`production/qa/bug-triage-*.md` file(s) being updated.
+
+Bundled triage cleanup is allowed only when it removes closed bugs from open
+tables, updates counts, clears stale recommended actions, or records a
+zero-open-bugs closure refresh. It must be explicitly marked non-blocking if it
+cannot be completed safely. Do not bundle if the triage work would require
+assigning priorities, choosing sprint scope, marking bugs Won't Fix, changing
+severity, or resolving conflicting bug states.
 
 After writing:
 - If any S1 bugs are unassigned: "S1 bugs must be assigned before the sprint

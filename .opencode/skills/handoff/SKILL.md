@@ -35,25 +35,94 @@ pair for `/resume-from-handoff`.
 
 ## Phase 0: Review Gate
 
-Before writing the final handoff or committing, review all files created or
-materially changed in this session.
+Before rotating continuity files or committing, run this mandatory two-round
+gate over every file created or materially changed in this session. The gate can
+halt the skill: if triage requires user direction, stop before Phase 1 and do
+not rotate, commit, or push.
 
-1. Self-review each touched file for project rules, design gates, naming, test
-   standards, and reporting integrity.
-2. Run an appropriate review when available for substantial code, executable
-   specs, cross-cutting docs, or milestone work. Use an adversarial/focused
-   review only for major milestone deliverables or explicit user challenge
-   language.
-3. Triage findings:
-   - Agree and confident to fix: fix now, then verify.
-   - Agree but out of scope: record in the handoff Deferred section with the
-     finding quoted.
-   - Disagree, uncertain, or scope-changing: stop and surface to the user.
-4. If fixes were applied, self-review the fix set. Run a second review only for
-   high-severity findings or cross-cutting executable changes.
-5. Cap review invocations at 3 unless the user explicitly approves more.
+The review stays inside the current OpenCode session. A native cross-check is a
+distinct native review pass performed by this session after setting aside its
+authoring conclusions and re-reading the deliverables with a reviewer lens.
+Never invoke `opencode` in a subshell, spawn a Task subagent reviewer, use a
+companion plugin, call another model service, or create an external data-egress
+approval path for this gate.
 
-Proceed only when no finding is blocking on user input.
+### Pure Design/Process-Document Exemption
+
+If the entire session changed only pure design/process-document content,
+self-review is sufficient and the native cross-check is skipped. This exemption
+covers instruction/rule files, skills, `AGENTS.md`, ADRs with no runtime impact,
+`design/gdd/**`, and memory files. Mixed code-and-document changes are not
+exempt. Executable specifications, CI configuration, tools, tests, public API
+contracts, and ADRs with runtime-behavioral requirements are not pure documents.
+
+### Round 1
+
+1. Self-review every touched file end-to-end, not just the diff. Check the
+   applicable ADRs, GDDs, project rules, naming, test standards, design gates,
+   verification claims, and recorded caveats.
+2. Unless the pure-document exemption applies, select exactly one native tier:
+   - `STANDARD` is the default for routine session work: individual ADR
+     amendments, tool / lint additions, tests, GDD system authoring, doc edits,
+     and CI tweaks.
+   - `ADVERSARIAL` is reserved for this exact major-deliverable trigger list:
+     Foundation ADR cluster closure, master architecture doc, control-manifest
+     v1.0+ promotion, batch ADR Proposed→Accepted events, stage-gate advances,
+     release candidates / gold masters, or explicit user `red-team / challenge`
+     language.
+   - If uncertain whether the work meets a major trigger, use `STANDARD`.
+3. Perform the selected cross-check as a fresh reasoning pass by the current
+   OpenCode session. Inspect the complete touched files and their relevant
+   contracts. Report each finding as `HIGH`, `MEDIUM`, or `LOW` with an exact
+   `path:line` reference, the violated contract or risk, and a concrete
+   recommendation. If there are no findings, report `CLEAN`.
+4. Triage every finding:
+   - Agree and confident that the fix preserves approved intent: apply it only
+     within files already created or materially modified during this session,
+     then run the narrowest meaningful verification.
+   - Agree but out of scope: do not apply it; record it in the handoff Deferred
+     section with the native finding quoted verbatim.
+   - Disagree, uncertain, disputed, design-changing, architectural,
+     game-feel/balance-changing, or scope-changing: halt and surface the finding
+     plus analysis to the user. Do not proceed to rotation or commit.
+
+### Round 2
+
+Run Round 2 only when Round 1 caused a fix.
+
+1. Always self-review the complete Round 1 fix set against the original finding,
+   surrounding behavior, and verification evidence.
+2. Run a second native cross-check only when Round 1 included at least one
+   `HIGH` finding or the fix changed cross-cutting executable behavior. This
+   includes shared helpers, CI configuration, determinism-critical paths such as
+   `src/core/sim/**`, public APIs, or ADR executable specifications. Use the
+   same `STANDARD` or `ADVERSARIAL` tier selected in Round 1. Pure
+   design/process-document fixes remain exempt from the second native
+   cross-check.
+3. Triage Round 2 with a stop bias because a new finding means the first fix was
+   incomplete:
+   - Trivial and confidently intent-preserving only: fix a typo, document-text
+     error, off-by-one in a named constant, or one-line obvious syntax error;
+     inline-self-review that exact edit, verify it, and record it in the
+     handoff. Do not run a third pass for this trivial fix.
+   - Any non-trivial fix, ambiguity, disagreement, scope change, design or
+     architecture decision, balance/game-feel decision, or finding outside the
+     Round 1 fix set: halt and surface it to the user before Phase 1.
+
+### Pass Cap And Audit Trail
+
+- Cap the gate at three native review passes total, counting Round 1, a
+  conditional Round 2 cross-check, and any user-directed rerun after a scope
+  extension. A fourth native review pass requires explicit user approval. When
+  asking, report the active reported context percentage and the estimated
+  additional percentage cost; never substitute fixed token-window or time
+  estimates. If the active percentage is unavailable, say so explicitly.
+- Record the review audit trail in `production/session-handoff.md`: exemption or
+  tier, `CLEAN` or findings, fixes applied and verified, findings deferred with
+  quotations, user-cleared findings, and any stopped pass.
+- The gate passes only when every finding is fixed and verified, explicitly
+  deferred as out of scope, or cleared by the user, with nothing blocking on
+  user input. Only then proceed to Phase 1.
 
 ## Phase 1: Choose The Label
 

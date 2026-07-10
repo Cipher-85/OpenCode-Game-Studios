@@ -7,8 +7,8 @@ description: "Use when starting a fresh project session, resuming from saved sta
 
 `/handoff` writes the canonical resume doc at the end of a session. This skill
 reads it once at the start of the next session, merges the live backlog with
-sprint and slice state, and compiles a ranked `## Session Worklist` (plus a
-`## Phase Guard`) into `production/session-state/active.md`.
+phase guardrails, and writes the current-session routing cache to
+`production/session-state/active.md`.
 
 This skill writes exactly one file: `production/session-state/active.md`. It
 does not commit, push, run mutating `gh`, launch builds, or run boot smoke.
@@ -30,8 +30,13 @@ operationalizes the canonical handoff narrative into the session cache.
 
 If `production/session-handoff.md` does not exist, do not substitute another
 document as the canonical handoff. Report that no handoff exists yet, recommend
-the appropriate first-session setup or `/handoff` once there is state to
-preserve, and stop unless the user asked for a general project audit.
+the appropriate route, and stop unless the user asked for a general project
+audit:
+
+- First-session setup: `/start`
+- Broad phase orientation: `/help`
+- Full gap discovery: `/project-stage-detect`
+- Preserve future state once work exists: `/handoff`
 
 ## Step 1: Read The Canonical State In Full
 
@@ -49,12 +54,16 @@ Read these in order. The handoff is the source of truth.
 3. `production/sprint-status.yaml` for per-story status if present.
 4. `production/session-state/active.md` if present. It is a local scratchpad in
    many projects and may not exist on a fresh clone.
-5. `production/session-archive.md` only to resolve a specific historical
+5. `production/stage.txt` if present. This is the authoritative current stage
+   anchor for phase guardrails.
+6. `.opencode/docs/workflow-catalog.yaml` if present. This is the authoritative
+   phase catalog and required-step sequence.
+7. `production/session-archive.md` only to resolve a specific historical
    question the live handoff does not answer. Do not read it by default.
 
 If the user passed a focus area, bias the worklist toward it, but still surface
 the handoff's own recommended Next Action and the vertical-slice forcing
-function.
+function. A focus argument biases ranking; it does not select a lane.
 
 ## Step 2: Apply The Vertical-Slice Forcing Function
 
@@ -79,6 +88,10 @@ Give the user a concise "you are here" map:
 
 - Stage from `production/stage.txt` if present and from the handoff Current
   Stage.
+- Catalog phase from `.opencode/docs/workflow-catalog.yaml` if present.
+- First incomplete required catalog step for that phase.
+- Next gate and any mismatch between `stage.txt`, handoff stage, and catalog
+  evidence.
 - Pipeline position: concept -> systems design -> technical setup ->
   pre-production -> production -> polish -> release.
 - Active milestone and sprint from the handoff or sprint status.
@@ -102,6 +115,8 @@ Group by lane:
   declared slice source.
 - Hygiene, deferred, and owed: open items, doc reconciles, deferred ACs, owed
   playtests, owed CI, and integrity checks.
+- Phase guard work: first incomplete required catalog step and the next gate
+  from `.opencode/docs/workflow-catalog.yaml` when present.
 
 For each item include:
 
@@ -110,8 +125,25 @@ For each item include:
   `/design-system`.
 - Slice tag: extend, feed, or carve-out.
 - Rough size in sessions, never days or weeks.
+- Source: handoff, sprint status, active state, slice source, stage file, or
+  workflow catalog.
 
 Do not silently truncate. If you cap the visible list, say what you left out.
+
+### Ranking Rules
+
+Rank in this order:
+
+1. Owed verification and blockers.
+2. Handoff Next Action and Tracked Open Items.
+3. In-progress or ready sprint stories.
+4. Slice-state playable advances.
+5. Required phase work from `stage.txt` and `workflow-catalog.yaml` when present.
+6. Optional hygiene or carve-outs.
+
+`stage.txt` and `workflow-catalog.yaml` are guardrails, not the whole backlog.
+Out-of-phase items may appear only when labeled as explicit carve-outs or user
+overrides.
 
 ## Step 5: Surface Blockers, Gates, And Integrity Items
 
@@ -130,7 +162,56 @@ Reporting integrity: this skill runs no measurements by default, so it has no
 verified numbers of its own unless you actually produced them in this turn.
 Report handoff figures as claims, not as facts you observed.
 
-## Step 6: Present The Resume Briefing
+FIRST verification cannot be waived by choosing another lane. Run any required
+read-only FIRST check before selection when project instructions authorize it.
+Otherwise put that check at the front of every affected lane and do not enter
+the selected workflow until the check clears or is reported blocked.
+
+## Step 6: Write The Session Cache
+
+Write `production/session-state/active.md` with the current session routing
+cache. Preserve only concise current-state notes from the old `active.md` when
+they are still relevant; stale scratchpad content should not outrank the live
+handoff.
+
+Required sections:
+
+```markdown
+# Active Session State
+
+Updated: [date/time or current date if exact time unavailable]
+Source: production/session-handoff.md
+
+## Current Focus
+- Stage: [stage from stage.txt or inferred]
+- Handoff stage: [handoff Current Stage or unset]
+- Milestone: [milestone or unset]
+- Sprint: [sprint or unset]
+- Slice: [version/label or undeclared]
+- Playable/Slice State Source: [relative path, Not declared, or unavailable path]
+
+## Phase Guard
+- Stage file: [value or missing]
+- Catalog phase: [phase key/label or unmatched]
+- First incomplete required step: [step + command or unknown]
+- Next gate: [current -> next phase, or none]
+- Phase mismatch: [none, unset stage, handoff drift, or out-of-phase backlog]
+
+## Session Worklist
+1. (Recommended) [lane title] - [why] -> `[command-or-skill]` [extend/feed/carve-out, ~N sessions, source]
+2. [lane title] - [why] -> `[command-or-skill]` [tag, ~N sessions, source]
+
+## Owed Before Starting
+- [owed verification, blocker, gate, or "None"]
+
+## Notes
+- [handoff claims vs verified-now caveats]
+```
+
+The write is part of this skill's declared workflow. Do not commit, push, or
+stage it here.
+
+## Step 7: Present The Resume Briefing
 
 Use this shape:
 
@@ -140,12 +221,19 @@ Use this shape:
 Stage: <stage> | Milestone: <milestone> | Sprint: <sprint> | Slice: <version or undeclared>
 Pipeline: concept -> ... -> [current] -> ...   next gate: <gate>
 Playable/Slice State Source: <relative path, Not declared, or unavailable path>
+Session cache: production/session-state/active.md updated
 
 Vertical-slice forcing function:
 - Slice version: <version and one-line real/stubbed state, or undeclared>
 - Last clean boot: <when, and whether verified this turn or reported by handoff>
 - Smallest next playable advance: <concrete, <=1 session>
 - This session's likely work: <extend/feed/carve-out>
+
+Phase guard:
+- Stage file: <value or missing>
+- Catalog phase: <phase>
+- First incomplete required step: <step or unknown>
+- Phase mismatch: <none/mismatch>
 
 Recommended next action:
 - <one top thing> - <why> -> `<command-or-skill>` [<tag>, ~<n> sessions]
@@ -160,73 +248,47 @@ Hygiene / deferred / owed:
 
 Before you start - check / honor first:
 - <owed verification or gate>
-
-Phase Guard:
-- Stage file: <value or missing>
-- Catalog phase: <phase key/label or unmatched>
-- First incomplete required step: <step + command or unknown>
-- Next gate: <current -> next phase, or none>
-- Phase mismatch: <none, unset stage, handoff drift, or out-of-phase backlog>
-
-Session Worklist:
-1. (Recommended) <lane title> - <why> -> `<command-or-skill>` [extend/feed/carve-out, ~N sessions, source]
-2. <lane title> - <why> -> `<command-or-skill>` [tag, ~N sessions, source]
 ```
 
-Write the `## Phase Guard` and `## Session Worklist` sections above into
-`production/session-state/active.md` (creating or overwriting only that file).
-This write is authorized by the `/resume-from-handoff` invocation; do not ask
-for permission mid-flow. Keep the rest of `active.md` if it already exists; only
-replace or add these two sections.
+The briefing ends at a selection boundary. Never start an unselected lane.
 
-After the briefing, do not end with a free-text "which would you like?" line.
-Proceed to Step 7.
+- If multiple lanes are genuinely viable, use the `question` tool when
+  available, with the recommendation as the first option. Keep the choices
+  compact, preserve exactly one recommendation, and wait for the user's
+  selection. If the `question` tool is unavailable, use the same ordered lanes
+  in a numbered prompt and wait for the numeric reply.
+- If exactly one lane is valid, present the numeric fallback:
+  `Next action:` then `1. (Recommended) [action label] - [reason / command]`.
+  Even for this single option, wait for the user to reply `1`; do not start it
+  automatically.
 
-## Step 7: Ask Which Work Item To Start With The `question` Tool
+Resume selection authorizes entering only the selected workflow. It does not
+authorize that workflow's writes, builds, boot smoke, mutating `gh`, commits,
+pushes, branch changes, design decisions, game-feel decisions, balance
+decisions, or any other mutation beyond approvals already declared by that
+workflow. A Follow-up fork inside the selected workflow is a new decision:
+use the `question` tool when available, otherwise use a compact numbered or
+lettered prompt, and wait again.
 
-After the briefing, capture the user's lane choice with the `question` tool when
-that tool is available in the current surface. Do not satisfy this step with an
-ordinary prose question when the `question` tool is available.
+Do not end with an unstructured "what do you want to do?" line.
 
-Build 2-3 mutually exclusive lane options from the ranked worklist:
-
-- Put the recommended primary path first and append `(Recommended)` to its
-  label.
-- Keep each label short, such as `Primary path`, `Sprint story`,
-  `Slice carve-out`, or `Hygiene`.
-- Each option description must include the one-line reason, start command or
-  skill, slice tag, and rough size in sessions.
-- Include owed FIRST checks in the option description or immediately before the
-  question so they cannot be skipped silently.
-- If the worklist has more than three viable lanes, show the full ranked menu in
-  the briefing text, then put only the top three choices in the picker.
-
-Use one `question` call with the recommended lane first and labeled
-`(Recommended)`.
-
-If the `question` tool is not available, fall back to a concise numbered prompt
-with the same options and make clear that the user should pick a number or name.
-
-Honor any FIRST verification owed regardless of the selected lane. Once the user
-selects, confirm the chosen lane and exact starting command. The selection is
-the user's explicit go-ahead for that lane; start that lane or hand off the exact
-command according to the lane's normal skill and project instructions.
-
-When the selected lane completes, read or refresh the saved `## Session Worklist`
-in `production/session-state/active.md` and present the next lane as a numbered
-next-action prompt. Do not point the user back to `/resume-from-handoff` after
-work completes.
+Do not point the user back to `/resume-from-handoff` after work completes. Later
+closeouts should read or refresh the saved `## Session Worklist` in `active.md`.
 
 ## Collaborative Protocol
 
 - Writes only `production/session-state/active.md`; no commits, pushes, mutating
-  `gh`, or boot smoke from this skill. Explicit invocation authorizes that one
-  write. Do not ask "May I write this session cache?" for
-  `production/session-state/active.md` after the user has invoked
-  `/resume-from-handoff`.
-- Use the `question` tool, not a free-text prompt, for the work-item choice and
-  follow-up decisions when the tool is available.
-- Never jump to work the user did not select.
+  `gh`, or boot smoke from this skill.
+- Explicit invocation authorizes that one write. Do not ask "May I write this
+  session cache?" for `production/session-state/active.md` after the user has
+  invoked `/resume-from-handoff`.
+- Use the `question` tool, not a free-text prompt, for true multi-lane choices
+  when the tool is available.
+- Never start an unselected lane. A single obvious lane still waits for the
+  user's numeric `1` selection.
+- Treat later workflow forks as new structured decisions; the resume choice
+  does not pre-answer them.
+- FIRST verification remains mandatory regardless of lane choice.
 - Make one primary recommendation. The user should leave knowing the top thing
   to do, with the rest as a ranked menu.
 - The vertical-slice forcing function overrides doc-track drift.
@@ -234,11 +296,12 @@ work completes.
 
 ## What This Skill Does Not Do
 
-- Does not write any file other than `production/session-state/active.md`; does
-  not commit, push, or run mutating `gh` — that is `/handoff`.
+- Does not write anything except `production/session-state/active.md`.
+- Does not start follow-on work before the user selects a lane.
+- Does not commit or push; that is `/handoff`.
 - Does not perform a full artifact gap audit; that is `/project-stage-detect`.
 - Does not replace reading the handoff; it operationalizes the canonical handoff
-  into the session routing cache.
+  into an oriented, prioritized session worklist.
 
 ## Closeout Contract
 

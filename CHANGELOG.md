@@ -1,5 +1,56 @@
 # Changelog
 
+## v0.4.2 - 2026-07-10
+
+Bridged Codex Game Studios v0.4.5–v0.4.7 (bug lifecycle consolidation, handoff
+two-round review gate, resume lane-selection boundary) into the OpenCode-native
+port.
+
+### v0.4.5 — Bug Lifecycle Consolidation
+
+- Updated `/bug-report verify` so a VERIFIED FIXED result can complete
+  verification evidence, closure, safe stale triage cleanup, and derived
+  session-state routing under one approved changeset.
+- Updated `/bug-report close` so already verified bugs can close and refresh
+  stale triage metadata without a separate bookkeeping prompt.
+- Clarified `/bug-triage` zero-open-bugs closure refresh as deterministic
+  metadata cleanup when no priority, sprint-scope, severity, or Won't Fix
+  decisions are needed.
+- Added `run_bug_lifecycle` validator to `.opencode/audit.sh` (run via
+  `audit.sh bug-lifecycle` or as part of `audit.sh all`) to prevent regression
+  into forced verify → close → triage handoffs.
+
+### v0.4.6 — Handoff Two-Round Review Gate
+
+- Restored `/handoff`'s mandatory two-round review gate, including
+  STANDARD/ADVERSARIAL tier selection, pure-document exemptions, finding
+  triage, conditional second review, pass caps, and an auditable handoff record.
+- Kept the cross-check inside the active OpenCode session and explicitly
+  forbade nested CLI invocations, Task subagent reviewers, companion plugins,
+  and external model services.
+- Expanded the `/handoff` authorization boundary in `AGENTS.md` for narrow
+  intent-preserving fixes and added a round-two non-trivial-finding stop rule.
+- Added `run_handoff_review` validator to `.opencode/audit.sh` (run via
+  `audit.sh handoff-review` or as part of `audit.sh all`) to prevent the review
+  contract or its no-egress safeguards from regressing.
+
+### v0.4.7 — Resume Lane-Selection Boundary
+
+- Added a hard `/resume-from-handoff` lane-selection boundary: focus arguments
+  only bias ranking, multiple lanes use the `question` tool for structured
+  choice, single lanes wait for numeric `1`, and follow-up forks remain separate
+  decisions.
+- Kept FIRST verification mandatory across resume lane choices and clarified
+  that entering a selected workflow grants no additional mutation authority.
+- Expanded the `/resume-from-handoff` exception in `AGENTS.md` so a focus
+  argument only biases ranking and selection authorizes entering only the
+  selected workflow.
+- Added explicit Ranking Rules (6-level priority) and separated session-cache
+  write (Step 6) from the briefing (Step 7) in `/resume-from-handoff`.
+- Added `run_resume_contract` validator to `.opencode/audit.sh` (run via
+  `audit.sh resume-contract` or as part of `audit.sh all`) to enforce the
+  selection-boundary contract and reject automatic lane startup.
+
 ## v0.4.1 - 2026-07-09
 
 Bridged Codex Game Studios v0.4.4 (user-owned playtest focus contract) into

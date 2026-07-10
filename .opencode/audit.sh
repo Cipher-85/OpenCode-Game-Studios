@@ -11,6 +11,9 @@
 #   closeout     Check closeout-routing contract on completion skills
 #   checkpoint   Check active.md silent-checkpoint contract on skills/agents
 #   playtest     Check playtest-focus contract on root/continuity/skill surfaces
+#   bug-lifecycle Check bug lifecycle consolidation contract on bug-report/triage
+#   handoff-review Check handoff two-round review-gate contract on handoff/AGENTS.md
+#   resume-contract Check resume lane-selection boundary on resume-from-handoff
 #   runtime      Check for stale references
 #   config       Validate opencode.json
 #   hooks        Test hook scripts
@@ -27,7 +30,7 @@ command="${1:-all}"
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --root) root="$(cd "$2" && pwd -P)"; shift 2 ;;
-    all|agents|skills|runtime|config|hooks|smoke|release|closeout|checkpoint|playtest) command="$1"; shift ;;
+    all|agents|skills|runtime|config|hooks|smoke|release|closeout|checkpoint|playtest|bug-lifecycle|handoff-review|resume-contract) command="$1"; shift ;;
     *) shift ;;
   esac
 done
@@ -257,6 +260,208 @@ run_playtest_focus() {
   printf '  %d playtest-focus surfaces checked\n' "$checked"
 }
 
+run_bug_lifecycle() {
+  printf '\n── Bug Lifecycle Contract ────────────────────────────────\n'
+  local checked=0
+
+  # --- bug-report required phrases ---
+  local report="$root/.opencode/skills/bug-report/SKILL.md"
+  checked=$((checked + 1))
+  if [ ! -f "$report" ]; then fail "bug-report/SKILL.md (missing)"; else
+    local report_norm; report_norm=$(tr -s '[:space:]' ' ' < "$report")
+    local -a req=(
+      "treat verification, closure, stale triage"
+      "one deterministic bug lifecycle operation"
+      "Do not stop after VERIFIED FIXED to offer"
+      "refresh stale triage metadata under the same approval"
+      "zero-open-bugs refresh"
+      "derived checkpoint"
+      'Do not ask a separate "May I write?" for'
+      "Do not bundle and stop for user decision if triage would require assigning"
+    )
+    local missing=() p
+    for p in "${req[@]}"; do
+      grep -qiF "$p" <<< "$report_norm" 2>/dev/null || missing+=("$p")
+    done
+    # Forbidden old-language fragments
+    local -a forbidden=(
+      "is referenced in the triage report"
+      "write the closure record and update status"
+      "remove it from the active list"
+    )
+    local bad=()
+    for p in "${forbidden[@]}"; do
+      grep -qiF "$p" <<< "$report_norm" 2>/dev/null && bad+=("$p")
+    done
+    if [ "${#missing[@]}" -eq 0 ] && [ "${#bad[@]}" -eq 0 ]; then
+      pass "bug-report/SKILL.md (lifecycle contract)"
+    else
+      local d=""
+      [ "${#missing[@]}" -gt 0 ] && d+=" missing: ${missing[*]}"
+      [ "${#bad[@]}" -gt 0 ] && d+=" forbidden-present: ${bad[*]}"
+      fail "bug-report/SKILL.md (lifecycle contract)$d"
+    fi
+  fi
+
+  # --- bug-triage required phrases ---
+  local triage="$root/.opencode/skills/bug-triage/SKILL.md"
+  checked=$((checked + 1))
+  if [ ! -f "$triage" ]; then fail "bug-triage/SKILL.md (missing)"; else
+    local triage_norm; triage_norm=$(tr -s '[:space:]' ' ' < "$triage")
+    local -a req2=(
+      "zero-open-bugs closure refresh"
+      "Treat it as metadata cleanup"
+      "non-blocking follow-up"
+      "Exception for bundled bug lifecycle cleanup"
+      "deterministic metadata cleanup"
+      "It must be explicitly marked non-blocking if it cannot be completed safely"
+      "Do not bundle if the triage work would require assigning priorities"
+    )
+    local missing2=() p2
+    for p2 in "${req2[@]}"; do
+      grep -qiF "$p2" <<< "$triage_norm" 2>/dev/null || missing2+=("$p2")
+    done
+    if [ "${#missing2[@]}" -eq 0 ]; then
+      pass "bug-triage/SKILL.md (lifecycle contract)"
+    else
+      fail "bug-triage/SKILL.md missing: ${missing2[*]}"
+    fi
+  fi
+  printf '  %d bug-lifecycle surfaces checked\n' "$checked"
+}
+
+run_handoff_review() {
+  printf '\n── Handoff Review Gate Contract ──────────────────────────\n'
+  local checked=0
+
+  # --- handoff SKILL.md required phrases ---
+  local skill="$root/.opencode/skills/handoff/SKILL.md"
+  checked=$((checked + 1))
+  if [ ! -f "$skill" ]; then fail "handoff/SKILL.md (missing)"; else
+    local skill_norm; skill_norm=$(tr -s '[:space:]' ' ' < "$skill")
+    local -a req=(
+      "## Round 1"
+      "## Round 2"
+      "\`STANDARD\`"
+      "\`ADVERSARIAL\`"
+      "Foundation ADR cluster closure"
+      "pure design/process-document"
+      "self-review is sufficient and the native cross-check is skipped"
+      "Mixed code-and-document changes are not exempt"
+      "distinct native review pass"
+      "current OpenCode session"
+      "\`HIGH\`, \`MEDIUM\`, or \`LOW\`"
+      "\`CLEAN\`"
+      "\`path:line\`"
+      "If uncertain whether the work meets a major trigger, use \`STANDARD\`"
+      "quoted verbatim"
+      "stop before Phase 1"
+      "second native cross-check"
+      "\`HIGH\` finding"
+      "cross-cutting executable behavior"
+      "Trivial and confidently intent-preserving only"
+      "Any non-trivial fix"
+      "Do not run a third pass"
+      "three native review passes"
+      "fourth native review pass"
+      "active reported context percentage"
+      "review audit trail"
+      "every finding"
+      "Only then proceed to Phase 1"
+    )
+    local missing=() p
+    for p in "${req[@]}"; do
+      grep -qF "$p" <<< "$skill_norm" 2>/dev/null || missing+=("$p")
+    done
+    if [ "${#missing[@]}" -eq 0 ]; then
+      pass "handoff/SKILL.md (review gate contract)"
+    else
+      fail "handoff/SKILL.md missing: ${missing[*]}"
+    fi
+  fi
+
+  # --- AGENTS.md required phrases ---
+  local agents="$root/AGENTS.md"
+  checked=$((checked + 1))
+  if [ ! -f "$agents" ]; then fail "AGENTS.md (missing)"; else
+    local agents_norm; agents_norm=$(tr -s '[:space:]' ' ' < "$agents")
+    local -a req2=(
+      "files already created or materially modified during the session"
+      "intent-preserving review fixes"
+      "active OpenCode session"
+      "Round-two non-trivial findings"
+      "external data-egress approval"
+      "new intent, architecture, game-feel, balance, or scope decisions"
+    )
+    local missing2=() p2
+    for p2 in "${req2[@]}"; do
+      grep -qF "$p2" <<< "$agents_norm" 2>/dev/null || missing2+=("$p2")
+    done
+    if [ "${#missing2[@]}" -eq 0 ]; then
+      pass "AGENTS.md (handoff review exception)"
+    else
+      fail "AGENTS.md missing: ${missing2[*]}"
+    fi
+  fi
+  printf '  %d handoff-review surfaces checked\n' "$checked"
+}
+
+run_resume_contract() {
+  printf '\n── Resume Lane-Selection Contract ────────────────────────\n'
+  if python3 - "$root" <<'PY'
+import re, sys, os
+root = sys.argv[1]
+rel = ".opencode/skills/resume-from-handoff/SKILL.md"
+path = os.path.join(root, rel)
+if not os.path.isfile(path):
+    print(f"  ! {rel}: missing file")
+    sys.exit(1)
+text = open(path, encoding="utf-8").read()
+norm = re.sub(r"\s+", " ", text)
+
+required = (
+    "A focus argument biases ranking; it does not select a lane.",
+    "Never start an unselected lane.",
+    "recommendation as the first option",
+    "wait for the user to reply `1`",
+    "Resume selection authorizes entering only the selected workflow",
+    "FIRST verification cannot be waived by choosing another lane",
+    "Follow-up fork",
+    "`question` tool",
+    "Playable/Slice State Source",
+    "production/stage.txt",
+    ".opencode/docs/workflow-catalog.yaml",
+    "production/session-state/active.md",
+)
+missing = [p for p in required if p not in norm]
+if missing:
+    print(f"  ! {rel}: missing phrase(s): " + ", ".join(missing))
+
+fails = len(missing)
+for i, line in enumerate(text.splitlines(), start=1):
+    lower = line.lower()
+    starts_lane = re.search(r"\b(?:start|begin|enter)\b", lower)
+    bypasses = any(w in lower for w in (
+        "automatically", "immediately", "without waiting", "without selection"
+    ))
+    forbidden = any(w in lower for w in (
+        "do not", "don't", "never", "must not", "cannot"
+    ))
+    if starts_lane and bypasses and not forbidden:
+        print(f"  ! {rel}:{i}: automatic lane startup forbidden; "
+              "pause for selection boundary")
+        fails += 1
+
+print(f"  resume-from-handoff checked, {fails} violation(s)")
+sys.exit(1 if fails else 0)
+PY
+  then
+    pass "resume selection contract satisfied"
+  else
+    fail "resume selection contract violations"
+  fi
+}
+
 run_runtime() {
   printf '\n── Runtime References ──────────────────────────────────────\n'
   # Check for stale Claude references
@@ -404,6 +609,9 @@ case "$command" in
     run_closeout
     run_checkpoint
     run_playtest_focus
+    run_bug_lifecycle
+    run_handoff_review
+    run_resume_contract
     run_runtime
     run_config
     run_hooks
@@ -414,12 +622,15 @@ case "$command" in
   closeout) run_closeout ;;
   checkpoint) run_checkpoint ;;
   playtest) run_playtest_focus ;;
+  bug-lifecycle) run_bug_lifecycle ;;
+  handoff-review) run_handoff_review ;;
+  resume-contract) run_resume_contract ;;
   runtime)  run_runtime ;;
   config)   run_config ;;
   hooks)    run_hooks ;;
   smoke)    run_smoke ;;
   release)  run_release ;;
-    *) printf 'Unknown command: %s\nAvailable: all, agents, skills, closeout, checkpoint, playtest, runtime, config, hooks, smoke, release\n' "$command" >&2; exit 2 ;;
+    *) printf 'Unknown command: %s\nAvailable: all, agents, skills, closeout, checkpoint, playtest, bug-lifecycle, handoff-review, resume-contract, runtime, config, hooks, smoke, release\n' "$command" >&2; exit 2 ;;
 esac
 
 printf '\n── Result: %d error(s) ──\n' "$errors"

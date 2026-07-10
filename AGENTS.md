@@ -99,10 +99,22 @@ Question -> Options -> Decision -> Draft -> Approval.
   mutating `gh`, or writes to any path other than
   `production/session-state/active.md`.
 - `/handoff` exception: explicit invocation of the OpenCode-native `/handoff`
-  skill counts as user approval for that skill's declared handoff workflow only:
-  update `production/session-handoff.md`, `production/session-archive.md`, and
-  `production/session-state/active.md`; stage relevant uncommitted changes by
-  path; create the standard handoff commit; and push the current branch.
+  skill counts as user approval for that skill's declared review gate and
+  handoff workflow only. The review must stay inside the active OpenCode
+  session; it must not launch a subprocess reviewer, spawn a Task subagent
+  reviewer, use a companion plugin, call another model service, or create an
+  external data-egress approval.
+- The exception authorizes confident, intent-preserving review fixes only in
+  files already created or materially modified during the session. Those fixes
+  may not introduce new intent, architecture, game-feel, balance, or scope
+  decisions. Unrelated files and new work remain unauthorized.
+- Round-two non-trivial findings, uncertain or disputed findings, and findings
+  that require design, architecture, game-feel, balance, or scope decisions must
+  stop for user direction before continuity rotation, commit, or push.
+- Once the review gate passes, the exception authorizes updating
+  `production/session-handoff.md`, `production/session-archive.md`, and
+  `production/session-state/active.md`; staging relevant uncommitted changes by
+  path; creating the standard handoff commit; and pushing the current branch.
 - The `/handoff` exception does not authorize design/game-feel/balance
   decisions, new source edits outside the continuity files, writes to undeclared
   files, branch switching, force-pushes, or `--no-verify` / amend workarounds.
@@ -113,6 +125,11 @@ Question -> Options -> Decision -> Draft -> Approval.
 - The `/resume-from-handoff` exception does not authorize edits to handoff,
   archive, source, design, or docs files; commits; pushes; branch changes;
   builds; boot smoke; mutating `gh`; or additional file writes.
+- A `/resume-from-handoff` focus argument only biases ranking. Resume must pause
+  for lane selection, and that selection authorizes entering only the selected
+  workflow. It does not grant any write, build, smoke, `gh`, commit, push,
+  branch, design, game-feel, balance, or other mutation authority that the
+  selected workflow does not already declare.
 - No commits without user instruction.
 
 See `docs/COLLABORATIVE-DESIGN-PRINCIPLE.md` for full protocol and examples.
