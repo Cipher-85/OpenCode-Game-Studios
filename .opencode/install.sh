@@ -321,7 +321,55 @@ if _collisions or (_modified and not replace_modified):
     sys.exit(1)
 # end preflight
 
-import filecmp
+import filecmp, datetime
+
+# Transaction setup: snapshot to-be-modified files and record to-be-created
+# files so a mid-deploy failure can roll the target back to its pre-deploy state.
+_stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+_txn_dir = os.path.join(target, '.opencode', 'backups', 'txn-' + _stamp)
+_txn_modified = {}   # rel -> snapshot path under _txn_dir
+_txn_created = []    # rels newly created (did not exist pre-deploy)
+
+def _snapshot(rel, dst):
+    if rel in _txn_modified:
+        return
+    snap = os.path.join(_txn_dir, 'modified', rel)
+    os.makedirs(os.path.dirname(snap), exist_ok=True)
+    shutil.copy2(dst, snap)
+    _txn_modified[rel] = snap
+
+def _rollback(reason):
+    print(f'\n-- Deploy failed: {reason} -- rolling back --', file=sys.stderr)
+    restored = removed = failed = 0
+    for rel, snap in _txn_modified.items():
+        try:
+            shutil.copy2(snap, os.path.join(target, rel))
+            restored += 1
+        except Exception as ex:
+            print(f'  WARN: could not restore {rel}: {ex}', file=sys.stderr)
+            failed += 1
+    for rel in _txn_created:
+        try:
+            if os.path.lexists(os.path.join(target, rel)):
+                os.remove(os.path.join(target, rel))
+                removed += 1
+        except Exception as ex:
+            print(f'  WARN: could not remove created {rel}: {ex}', file=sys.stderr)
+            failed += 1
+    rb_dir = os.path.join(target, '.opencode', 'backups', 'rollback-' + _stamp)
+    try:
+        if os.path.isdir(_txn_dir) and not os.path.exists(rb_dir):
+            os.rename(_txn_dir, rb_dir)
+    except Exception:
+        pass
+    print(f'  Restored {restored} modified file(s), removed {removed} created file(s).', file=sys.stderr)
+    print(f'  Rollback record: {rb_dir}', file=sys.stderr)
+    if failed:
+        print(f'  {failed} file(s) could not be reverted — inspect manually.', file=sys.stderr)
+    print('  Newly-created empty parent directories may linger; remove them if desired.', file=sys.stderr)
+    sys.exit(1)
+
+os.makedirs(_txn_dir, exist_ok=True)
 
 copied = 0
 skipped_foreign = 0
@@ -331,76 +379,90 @@ marker_files = 0
 preserved_list = []
 created_list = []
 
-for entry in data.get('files', []):
-    rel = entry['path']
-    mode_flag = entry.get('mode', 'copy')
-    src = os.path.join(source, rel)
-    dst = os.path.join(target, rel)
+try:
+    for entry in data.get('files', []):
+        rel = entry['path']
+        mode_flag = entry.get('mode', 'copy')
+        src = os.path.join(source, rel)
+        dst = os.path.join(target, rel)
 
-    if not os.path.exists(src):
-        continue
+        if not os.path.exists(src):
+            continue
 
-    # Hard guard: refuse foreign-runtime paths
-    if is_foreign(rel):
-        print(f'  REFUSED (foreign): {rel}', file=sys.stderr)
-        skipped_foreign += 1
-        continue
+        # Hard guard: refuse foreign-runtime paths
+        if is_foreign(rel):
+            print(f'  REFUSED (foreign): {rel}', file=sys.stderr)
+            skipped_foreign += 1
+            continue
 
-    # Coexistence: preserve ALL existing non-.opencode files (not just shared paths)
-    if is_coexist_mode(mode) and os.path.exists(dst) and not rel.startswith('.opencode/'):
-        preserved_list.append(rel)
-        preserved += 1
-        continue
+        # Coexistence: preserve ALL existing non-.opencode files (not just shared paths)
+        if is_coexist_mode(mode) and os.path.exists(dst) and not rel.startswith('.opencode/'):
+            preserved_list.append(rel)
+            preserved += 1
+            continue
 
-    os.makedirs(os.path.dirname(dst), exist_ok=True)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
 
-    if mode_flag == 'marker':
-        # Marker-block splice
-        if os.path.isfile(dst) and marker_start in open(dst).read():
-            with open(src) as f:
-                src_txt = f.read()
-            with open(dst) as f:
-                dst_txt = f.read()
-            m = re.search(r'(' + re.escape(marker_start) + r'.*?' + re.escape(marker_end) + r')', src_txt, re.S)
-            if m:
-                dst_txt = re.sub(
-                    re.escape(marker_start) + r'.*?' + re.escape(marker_end),
-                    m.group(1), dst_txt, flags=re.S
-                )
-                with open(dst, 'w') as f:
-                    f.write(dst_txt)
-            marker_files += 1
-        elif os.path.isfile(dst):
-            with open(src) as f:
-                src_txt = f.read()
-            m = re.search(r'(' + re.escape(marker_start) + r'.*?' + re.escape(marker_end) + r')', src_txt, re.S)
-            if m:
-                with open(dst, 'a') as f:
-                    f.write('\n' + m.group(1) + '\n')
-            marker_files += 1
+        if mode_flag == 'marker':
+            # Marker-block splice
+            if os.path.isfile(dst):
+                _snapshot(rel, dst)   # splice/append modifies the existing file
+                if marker_start in open(dst).read():
+                    with open(src) as f:
+                        src_txt = f.read()
+                    with open(dst) as f:
+                        dst_txt = f.read()
+                    m = re.search(r'(' + re.escape(marker_start) + r'.*?' + re.escape(marker_end) + r')', src_txt, re.S)
+                    if m:
+                        dst_txt = re.sub(
+                            re.escape(marker_start) + r'.*?' + re.escape(marker_end),
+                            m.group(1), dst_txt, flags=re.S
+                        )
+                        with open(dst, 'w') as f:
+                            f.write(dst_txt)
+                    marker_files += 1
+                else:
+                    with open(src) as f:
+                        src_txt = f.read()
+                    m = re.search(r'(' + re.escape(marker_start) + r'.*?' + re.escape(marker_end) + r')', src_txt, re.S)
+                    if m:
+                        with open(dst, 'a') as f:
+                            f.write('\n' + m.group(1) + '\n')
+                    marker_files += 1
+            else:
+                shutil.copy2(src, dst)
+                copied += 1
+                _txn_created.append(rel)
+                if is_shared(rel):
+                    created_list.append(rel)
+        elif rel == 'opencode.json':
+            if not os.path.exists(dst):
+                shutil.copy2(src, dst)
+                copied += 1
+                _txn_created.append(rel)
         else:
+            # Standard copy with backup-if-differs (snapshot for rollback on change)
+            if os.path.isfile(dst):
+                if not filecmp.cmp(src, dst, shallow=False):
+                    _snapshot(rel, dst)
+                    backup_path = os.path.join(target, '.opencode', 'backups', _stamp, rel)
+                    os.makedirs(os.path.dirname(backup_path), exist_ok=True)
+                    shutil.copy2(dst, backup_path)
+            else:
+                _txn_created.append(rel)
+                if is_shared(rel):
+                    created_list.append(rel)
             shutil.copy2(src, dst)
             copied += 1
-            if is_shared(rel):
-                created_list.append(rel)
-    elif rel == 'opencode.json':
-        if not os.path.exists(dst):
-            shutil.copy2(src, dst)
-            copied += 1
-    else:
-        # Standard copy with backup-if-differs
-        if os.path.isfile(dst) and not filecmp.cmp(src, dst, shallow=False):
-            backup_path = os.path.join(
-                target, '.opencode', 'backups',
-                __import__('datetime').datetime.now(__import__('datetime').timezone.utc).strftime('%Y%m%dT%H%M%SZ'),
-                rel
-            )
-            os.makedirs(os.path.dirname(backup_path), exist_ok=True)
-            shutil.copy2(dst, backup_path)
-        shutil.copy2(src, dst)
-        copied += 1
-        if is_shared(rel):
-            created_list.append(rel)
+except Exception as _e:
+    _rollback(str(_e))
+
+# Success: remove the ephemeral transaction dir. The per-file backup-if-differs
+# already retained persistent history under .opencode/backups/<stamp>/.
+try:
+    shutil.rmtree(_txn_dir)
+except Exception:
+    pass
 
 # Write preserved/created lists
 with open(preserved_path, 'w') as f:

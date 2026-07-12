@@ -280,6 +280,11 @@ bash .opencode/install.sh --replace-modified /path/to/existing-game-project
 
 `--replace-modified` never overwrites an unowned shared file.
 
+A cross-target deploy is transactional: if the deploy fails partway, modified
+files are restored from the transaction snapshot and newly-created files are
+removed, leaving the target at its pre-deploy state. A `rollback-<timestamp>/`
+record is kept under `.opencode/backups/` for inspection.
+
 ### What the installer modifies
 
 1. **`.opencode/agents/*.md`** — injects `model:` and `variant:` into each

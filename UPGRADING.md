@@ -144,6 +144,10 @@ bash .opencode/install.sh --replace-modified /path/to/project
 ```
 
 `--replace-modified` never adopts an unowned shared path; merge those manually.
+A cross-target deploy is transactional: a mid-deploy failure restores modified
+files from the transaction snapshot and removes newly-created files, leaving
+the target at its pre-deploy state (a `rollback-<timestamp>/` record is kept
+under `.opencode/backups/`).
 Uninstall is also fail-closed: it requires valid `.opencode/install-state.json`
 ownership data and aborts without removing files when state is missing, stale,
 malformed, path-traversing, or symlinked.
