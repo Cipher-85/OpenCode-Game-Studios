@@ -13,7 +13,7 @@
   <a href=".opencode/skills"><img src="https://img.shields.io/badge/skills-77-green" alt="77 Skills"></a>
   <a href=".opencode/commands"><img src="https://img.shields.io/badge/commands-77-yellow" alt="77 Commands"></a>
   <a href=".opencode/hooks"><img src="https://img.shields.io/badge/hooks-12-orange" alt="12 Hooks"></a>
-  <a href=".opencode/VERSION"><img src="https://img.shields.io/badge/version-0.4.2-blue" alt="v0.4.2"></a>
+  <a href=".opencode/VERSION"><img src="https://img.shields.io/badge/version-0.5.0-blue" alt="v0.5.0"></a>
   <a href="https://opencode.ai"><img src="https://img.shields.io/badge/built%20for-OpenCode-f5f5f5" alt="Built for OpenCode"></a>
 </p>
 
@@ -69,7 +69,7 @@ first brainstorm to launch.
 
 ## Current Status
 
-Package version: `0.4.2` (see [`.opencode/VERSION`](.opencode/VERSION)).
+Package version: `0.5.0` (see [`.opencode/VERSION`](.opencode/VERSION)).
 
 This release includes:
 - Hard `/resume-from-handoff` lane-selection boundary: focus arguments only bias
@@ -107,9 +107,36 @@ This release includes:
   Code-Turn Discipline, Workflow Gates, File Lifecycle, Continuity Epilogue)
 - Model-agnostic installer with 3-tier model selection and hard validation
 - Coexistence detection for Claude Code, Codex, and mixed-runtime projects
-- Manifest-driven deploy with backup-before-overwrite and shared-path preservation
+- Manifest-driven deploy with fail-closed preflight, `--replace-modified`, and transactional rollback
 - Spawn-based plugin with payload capture for runtime verification
 - `'*': deny` permission model with `question`/`todowrite` allowed for all agents
+- `.env*` denied across `read`/`edit`/`glob`/`bash` so secrets are protected at the permission layer
+
+## Runtime Parity Limits
+
+This is a faithful semantic port of the upstream Claude Code Game Studios
+structure with documented runtime limits — not a claim that every upstream
+enforcement primitive is reproduced exactly in OpenCode:
+
+- **Path rules are advisory.** Root `AGENTS.md` routes edits to
+  `.opencode/rules/*.md`, but nested rule files are not auto-discovered by
+  OpenCode on every edit; agents are instructed to read them. Per-edit rule
+  triggering is instruction-backed, not a hard platform hook.
+- **Per-agent fences are instruction/rule/hook-backed.** Where upstream roles
+  deny specific tools, the OpenCode equivalent is enforced through agent
+  instructions, path rules, and the `ccgs-hooks.js` plugin rather than an exact
+  per-agent hard fence.
+- **Model tiers are guidance.** Per-agent `metadata.ccgs_tier` maps to a model
+  tier configured at install time; the OpenCode session model choice remains the
+  available runtime control.
+- **Installer success ≠ activation.** A successful install deploys files and
+  passes the static audit only. Trust the project and start a new `opencode`
+  session before hooks, rules, the permission profile, and agents are active.
+- **Prototype/worktree isolation** is explicit workflow guidance, not automatic
+  subagent isolation.
+
+The advisory `audit.sh coexistence` and `smoke-headless` commands surface
+regressions in these areas without blocking the build.
 
 ## Studio Hierarchy
 
@@ -415,7 +442,7 @@ opencode.json                        # Permissions, plugin ref, instruction file
   uninstall.sh                       # Coexistence-aware uninstaller
   audit.sh                           # Validation dispatcher
   release.sh                         # Version management + GitHub releases
-  VERSION                            # Package version (0.4.2)
+  VERSION                            # Package version (0.5.0)
 design/                              # GDDs, narrative docs (AGENTS.md + registry/)
 docs/                                # Technical docs, ADRs, engine reference
 production/                          # Sprint plans, milestones, session state

@@ -1,5 +1,63 @@
 # Changelog
 
+## v0.5.0 - 2026-07-12
+
+Bridged Codex Game Studios v0.5–v0.6 (upstream commit 259cff8) into the
+OpenCode-native port. Adopted the portable behavioral improvements only;
+Codex-platform internals (MultiAgent V2 role-activation proof, `.codex`
+installer/validators, CCGS framework frontmatter, skill delegation dialect)
+are intentionally not ported — OpenCode's Task/subagent model and `.opencode`
+structure make them inapplicable or already-equivalent.
+
+### Phase 1 — Secret protection + trust/activation messaging
+
+- Added `edit` and `glob` `*.env*` denies to `opencode.json` (the `edit` scope
+  covers write/patch), closing a gap where agents could create/overwrite
+  secrets via the write tool. Consolidated `read` to a single `*.env*`
+  catch-all so nested files and `.envrc` are covered; `*.env.example` stays
+  allowed for templates.
+- Install banner, README, and UPGRADING now state that installer success is
+  static-only and a new opencode session is required before hooks,
+  permissions, and agents are active.
+- `audit.sh config` now asserts an `edit` `*.env*` deny exists (regression guard).
+
+### Phase 2a — Installer/uninstaller fail-closed hardening
+
+- `coexistence.sh`: added `ccgs_state_validate` (exists/schema==2/valid
+  JSON/no path-traversal/no symlink) and `ccgs_state_owned_paths`.
+- `uninstall.sh`: fail-closed — removed the source-manifest fallback so
+  missing/invalid state aborts without removing files; dropped the redundant
+  emptiness-based AGENTS.md re-check; limited pruning to `.opencode/`.
+- `install.sh`: `--replace-modified` opt-in + Python preflight that aborts
+  before mutation on unowned collisions and locally-modified package files.
+- `audit.sh`: `run_install_safety` validator (5 static guards) wired into
+  `all` and exposed as `audit.sh install-safety`.
+
+### Phase 2b — Transactional deploy + rollback
+
+- `install.sh`: the cross-target deploy is now transactional — to-be-overwritten
+  files are snapshotted and created files recorded before mutation; a
+  mid-deploy failure restores modified files and removes created files, leaving
+  the target at its pre-deploy state. A `rollback-<timestamp>/` record is kept
+  for inspection.
+
+### Phase 3 — Advisory coexistence + smoke-headless checks
+
+- `audit.sh coexistence`: real install/uninstall matrix in a temp dir (fresh
+  install, collision abort, modified abort, `--replace-modified`, uninstall
+  missing-state, uninstall valid-state, transactional rollback).
+- `audit.sh smoke-headless`: command→skill graph integrity; model-driven smoke
+  deferred until a CI model runner exists.
+- `.github/workflows/release-check.yml`: `coexistence-advisory` and
+  `smoke-headless-advisory` jobs (`continue-on-error: true`); the existing
+  `validate` job remains the blocking gate.
+
+### Phase 4 — Runtime parity limits doc
+
+- README: new "Runtime Parity Limits" section documenting OpenCode-specific
+  enforcement limits honestly (advisory path rules, instruction-backed fences,
+  model tiers as guidance, installer success ≠ activation).
+
 ## v0.4.2 - 2026-07-10
 
 Bridged Codex Game Studios v0.4.5–v0.4.7 (bug lifecycle consolidation, handoff
