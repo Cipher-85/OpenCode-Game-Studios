@@ -229,26 +229,68 @@ Never use `--no-verify`. Never amend as a workaround for a failed hook.
 
 ## Phase 4: Push Handoff
 
-Determine the current branch:
+Determine the current branch and its configured upstream:
 
 ```bash
 git rev-parse --abbrev-ref HEAD
+git rev-parse --abbrev-ref --symbolic-full-name '@{u}'
 ```
 
-Push the handoff commit to the current branch's remote. This is a routine
-backup of the handoff state — not a merge decision and not a push to main.
+Treat a non-zero upstream lookup as the expected no-upstream case, not as a
+Phase failure. Do not substitute a different branch. If an upstream exists,
+derive its remote name from the returned `<remote>/<branch>` value and verify
+that remote's push URL. If no upstream exists, verify `origin` because it is the
+only remote authorized for the setup push:
+
+```bash
+git remote get-url --push <upstream-remote>
+git remote get-url --push origin
+```
+
+Run only the command that matches the detected upstream state. Halt if the
+required push remote is missing.
+
+When the push remote is on `github.com`, establish destination evidence in this
+same handoff turn immediately before the push:
+
+```bash
+gh auth status -h github.com
+gh api user --jq .login
+gh repo view <owner>/<repo> --json viewerPermission --jq .viewerPermission
+```
+
+Derive `<owner>/<repo>` from the verified remote URL. Run these read-only GitHub
+checks with the network access they require; a failure from a network-restricted
+sandbox is not evidence that the stored credential is invalid. Never request or
+display a token. Continue only when the authenticated account and a `WRITE`,
+`MAINTAIN`, or `ADMIN` permission establish that the destination is authorized.
+Otherwise halt and report the exact failed check.
+
+Push the handoff commit only if the handoff trigger or user instruction
+authorizes it. This is a routine backup of the handoff state — not a merge
+decision and not a push to main. Use exactly one of these command shapes:
+
+- If the branch has an upstream: `git push`.
+- If the branch has no upstream: `git push -u origin <branch>`.
+
 Explicit `/handoff` invocation is normal push authorization for the standard
-handoff commit.
+handoff commit; the OpenCode session will surface its native permission prompt
+for the `git push` command. The justification must state that this is the
+explicitly authorized, non-force handoff push; name the verified remote,
+authenticated account, and permission; and identify the current branch/upstream.
 
-- If the branch has an upstream: `git push`
-- If the branch has no upstream: `git push -u origin <branch>`
+Never force-push. If the OpenCode permission prompt or approval review denies
+the push, halt Phase 4 — report the exact denial and do not retry with another
+command shape, indirect execution, or workaround. The user may re-run the
+handoff push once the permission is granted; do not bypass the prompt.
 
-Never force-push. If the push fails (auth, network, rejected), report it and
-continue to Phase 5 — the handoff is valid locally regardless.
+If the push instead fails for runtime reasons (auth token rejected, network,
+remote rejected), report it and continue to Phase 5 — the handoff is valid
+locally regardless.
 
-Pushing to a feature or test branch is expected handoff behavior. Only
-hesitate if the current branch is `main`, `master`, or `develop` — in that
-case, ask the user before pushing.
+Pushing to a feature or test branch is expected handoff behavior. Only hesitate
+if the current branch is `main`, `master`, or `develop` — in that case, ask the
+user before pushing.
 
 ## Phase 5: Report And Stop
 

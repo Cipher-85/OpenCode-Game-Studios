@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.5.1 - 2026-07-16
+
+Bridged Codex Game Studios handoff-push hardening (upstream commit `0c6df429`)
+into the OpenCode-native port.
+
+- Hardened `/handoff` Phase 4 push routing: existing-upstream branches use plain
+  `git push`, branches without an upstream use `git push -u origin <branch>`.
+- Added same-turn GitHub destination evidence (`gh auth status`, `gh api user`,
+  `gh repo view … viewerPermission`) before handoff pushes, requiring
+  `WRITE`/`MAINTAIN`/`ADMIN`; network-restricted sandbox failures are not
+  treated as invalid credentials.
+- Translated Codex's `["git","push"]` escalation + `/approve` dialect to the
+  OpenCode native permission-prompt model; policy denial fails closed with no
+  command-shape workaround.
+- Preserved OpenCode-local rules: hesitate before pushing `main`/`master`/
+  `develop`, and runtime push failures remain non-fatal (handoff valid locally).
+
+Codex-platform internals from the v0.6.0/v0.6.1 releases (`.codex/*` validators,
+`validate_smoke.py`, role-activation fixtures, CCGS frontmatter) are
+intentionally not ported — OpenCode's Task/subagent model and `.opencode`
+structure make them inapplicable or already-equivalent.
+
 ## v0.5.0 - 2026-07-12
 
 Bridged Codex Game Studios v0.5–v0.6 (upstream commit 259cff8) into the
