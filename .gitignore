@@ -152,3 +152,9 @@ opencode-plan.md
 
 # Plugin payload captures (debug artifacts)
 porting-reports/
+
+# App launcher (machine-specific, created by mklauncher)
+/opencode-game-studios (Kimi).app/
+
+# Local branding asset (machine-specific)
+assets/branding/app-icon.png
